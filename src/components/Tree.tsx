@@ -6,12 +6,13 @@ const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
+    const [wrapperHeight, setWrapperHeight] = useState<number>(0);
 
     useEffect(() => {
         if (wrapperRef.current && treeData) {
             const {width, height} = dimensions || wrapperRef.current.getBoundingClientRect();
             const root = hierarchy(treeData);
-            const treeLayout = tree().size([height, width]);
+            const treeLayout = tree().size([height * 2, width])
             const diagonal = linkHorizontal().x((d: any) => d.y).y((d: any) => d.x);
 
             root.descendants().forEach((d, i) => {
@@ -32,9 +33,11 @@ const Tree = ({data} : {data: any}) => {
             const svg = select(wrapperRef.current)
                 .append('svg')
                 .attr(
-                "viewBox",
-                `-${(width * 1.25 - width) / 2} 0 ${width * 1.25} ${height}`
-            );
+                    "viewBox",
+                    `-${(width * 1.25 - width) / 2} 0 ${width * 1.1} ${height * 2}`
+                )
+                .classed("svg-content-responsive", true)
+
 
             const gLink = svg
                 .append("g")
@@ -78,7 +81,6 @@ const Tree = ({data} : {data: any}) => {
 
             const createLevelBackgrounds = (root:any) => {
                 const levels = root.height + 1;
-                const levelHeight = height / levels;
                 const levelWidth = width / levels;
                 const backgroundGroup = svg.insert("g", ":first-child");
 
@@ -87,7 +89,7 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", 0)
                     .attr("y", 0)
                     .attr("width", levelWidth)
-                    .attr("height", height)
+                    .attr("height", height * 2)
                     .attr("fill", "white")
                     .lower();
 
@@ -96,9 +98,9 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", levelWidth)
                     .attr("y", 0)
                     .attr("width", levelWidth)
-                    .attr("height", height)
+                    .attr("height", height * 2)
                     .attr("fill", "#52B87F")
-                    .attr('opacity', 0.05)
+                    .attr('opacity', 0.1)
                     .lower();
 
                 backgroundGroup
@@ -106,9 +108,9 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", levelWidth * 2)
                     .attr("y", 0)
                     .attr("width", levelWidth)
-                    .attr("height", height)
+                    .attr("height", height * 2)
                     .attr("fill", "#EEEEEE")
-                    .attr('opacity', 0.4)
+                    .attr('opacity', 0.5)
                     .lower();
 
                 backgroundGroup
@@ -116,20 +118,19 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", levelWidth * 3)
                     .attr("y", 0)
                     .attr("width", levelWidth)
-                    .attr("height", height)
-                    .attr("fill", "white")
+                    .attr("height", height * 2)
+                    .attr("fill", "#EEEEEE")
+                    .attr('opacity', 0.25)
                     .lower();
             };
 
             createLevelBackgrounds(root)
             createLevelHeaders(root);
 
-
             const update = (source:any) => {
                 const duration = 500;
                 const nodes = root.descendants().reverse();
                 const links = root.links();
-
                 // Compute the new tree layout.
                 let left:any = root;
                 let right:any = root;
@@ -143,10 +144,6 @@ const Tree = ({data} : {data: any}) => {
                 const transition = svg
                     .transition()
                     .duration(duration)
-                    .attr(
-                        "viewBox",
-                        `-${(width * 1.25 - width) / 2} 0 ${width * 1.25} ${height}`
-                    )
                     .tween(
                         "resize",
                         // @ts-ignore
@@ -154,8 +151,6 @@ const Tree = ({data} : {data: any}) => {
                     );
 
                 nodes.forEach(function(d:any) { d.y = d.depth * width/ 4; });
-
-
                 // Update the nodes…
                 const node = gNode.selectAll("g").data(nodes, (d:any) => d.id);
 
@@ -173,7 +168,7 @@ const Tree = ({data} : {data: any}) => {
 
                 nodeEnter
                     .append("circle")
-                    .attr("r", 2.5)
+                    .attr("r", 4)
                     .attr("fill", (d:any) => (d._children ? "#555" : "#999"))
                     .attr("stroke-width", 10);
 
@@ -243,8 +238,7 @@ const Tree = ({data} : {data: any}) => {
 
 
     return(
-        <div ref={wrapperRef} style={{height: '100%', width:'100%', paddingTop: 40}}>
-        </div>
+        <div ref={wrapperRef} style={{height: '100%', width:'100%', margin: 'auto'}} />
     )
 }
 

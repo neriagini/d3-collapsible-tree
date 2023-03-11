@@ -94,8 +94,7 @@ const Tree = ({data} : {data: any}) => {
                 nodeEnter
                     .append("circle")
                     .attr("r", 2.5)
-                    // @ts-ignore
-                    .attr("fill", (d) => (d._children ? "#555" : "#999"))
+                    .attr("fill", (d:any) => (d._children ? "#555" : "#999"))
                     .attr("stroke-width", 10);
 
                 nodeEnter
@@ -136,24 +135,20 @@ const Tree = ({data} : {data: any}) => {
                     .append("path")
                     .attr("d", (d) => {
                         const o = { x: source.x0, y: source.y0 };
-                        // @ts-ignore
-                        return diagonal({ source: o, target: o });
+                        return diagonal({ source: o, target: o } as any);
                     });
 
                 // Transition links to their new position.
-                // @ts-ignore
-                link.merge(linkEnter).transition(transition).attr("d", diagonal);
+                link.merge(linkEnter as any).transition(transition as any).attr("d", diagonal as any);
 
                 // Transition exiting nodes to the parent's new position.
                 link
                     .exit()
-                    // @ts-ignore
-                    .transition(transition)
+                    .transition(transition as any)
                     .remove()
                     .attr("d", (d) => {
                         const o = { x: source.x, y: source.y };
-                        // @ts-ignore
-                        return diagonal({ source: o, target: o });
+                        return diagonal({ source: o, target: o } as any);
                     });
 
                 // Stash the old positions for transition.

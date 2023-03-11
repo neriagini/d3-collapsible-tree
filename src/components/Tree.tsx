@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, linkHorizontal, select, tree} from 'd3';
+import {hierarchy, linkHorizontal, map, max, min, scaleOrdinal, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
 
 const Tree = ({data} : {data: any}) => {
@@ -48,6 +48,83 @@ const Tree = ({data} : {data: any}) => {
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all");
 
+
+            const levelColors = ["#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#e6550d", "#fd8d3c", "#fdae6b", "#fdd0a2", "#31a354", "#74c476", "#a1d99b", "#c7e9c0", "#756bb1", "#9e9ac8", "#bcbddc", "#dadaeb", "#636363", "#969696", "#bdbdbd", "#d9d9d9"];
+
+            const createLevelHeaders = (root:any) => {
+                const levels = root.height + 1;
+                const levelWidth = width / levels;
+                const headerGroup = svg.append("g");
+
+                for (let i = 0; i < levels; i++) {
+                    headerGroup
+                        .append("text")
+                        .attr("x", i * levelWidth + levelWidth / 2)
+                        .attr("y", 10)
+                        .attr("fill", levelColors[i % levelColors.length])
+                        .attr("font-weight", "bold")
+                        .attr("text-anchor", "middle")
+                        .text(`Level ${i + 1}`);
+
+                    svg
+                        .append("title")
+                        .text(`Level ${i + 1}`)
+                        .attr("x", i * levelWidth + levelWidth / 2)
+                        .attr("y", 20);
+                }
+            };
+
+            createLevelHeaders(root);
+
+            const createLevelBackgrounds = (root:any) => {
+                const levels = root.height + 1;
+                const levelHeight = height / levels;
+                const levelWidth = width / levels;
+                const backgroundGroup = svg.insert("g", ":first-child");
+
+                backgroundGroup
+                    .append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", levelWidth)
+                    .attr("height", height)
+                    .attr("fill", "white")
+                    .lower();
+
+                backgroundGroup
+                    .append("rect")
+                    .attr("x", levelWidth)
+                    .attr("y", 0)
+                    .attr("width", levelWidth)
+                    .attr("height", height)
+                    .attr("fill", "#52B87F")
+                    .attr('opacity', 0.05)
+                    .lower();
+
+                backgroundGroup
+                    .append("rect")
+                    .attr("x", levelWidth * 2)
+                    .attr("y", 0)
+                    .attr("width", levelWidth)
+                    .attr("height", height)
+                    .attr("fill", "#EEEEEE")
+                    .attr('opacity', 0.4)
+                    .lower();
+
+                backgroundGroup
+                    .append("rect")
+                    .attr("x", levelWidth * 3)
+                    .attr("y", 0)
+                    .attr("width", levelWidth)
+                    .attr("height", height)
+                    .attr("fill", "white")
+                    .lower();
+            };
+
+            createLevelBackgrounds(root)
+            createLevelHeaders(root);
+
+
             const update = (source:any) => {
                 const duration = 500;
                 const nodes = root.descendants().reverse();
@@ -75,6 +152,9 @@ const Tree = ({data} : {data: any}) => {
                         // @ts-ignore
                         window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
                     );
+
+                nodes.forEach(function(d:any) { d.y = d.depth * width/ 4; });
+
 
                 // Update the nodes…
                 const node = gNode.selectAll("g").data(nodes, (d:any) => d.id);
@@ -163,7 +243,7 @@ const Tree = ({data} : {data: any}) => {
 
 
     return(
-        <div ref={wrapperRef} style={{height: '100%', width:'100%'}}>
+        <div ref={wrapperRef} style={{height: '100%', width:'100%', paddingTop: 40}}>
         </div>
     )
 }

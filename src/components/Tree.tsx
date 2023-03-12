@@ -6,7 +6,6 @@ const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
-    const [wrapperHeight, setWrapperHeight] = useState<number>(0);
 
     useEffect(() => {
         if (wrapperRef.current && treeData) {
@@ -34,10 +33,9 @@ const Tree = ({data} : {data: any}) => {
                 .append('svg')
                 .attr(
                     "viewBox",
-                    `-${(width * 1.25 - width) / 2} 0 ${width * 1.1} ${height * 2}`
+                    `-200 -100 ${width + 250} ${height * 2 + 100}`
                 )
                 .classed("svg-content-responsive", true)
-
 
             const gLink = svg
                 .append("g")
@@ -51,9 +49,6 @@ const Tree = ({data} : {data: any}) => {
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all");
 
-
-            const levelColors = ["#3182bd", "#6baed6", "#9ecae1", "#c6dbef", "#e6550d", "#fd8d3c", "#fdae6b", "#fdd0a2", "#31a354", "#74c476", "#a1d99b", "#c7e9c0", "#756bb1", "#9e9ac8", "#bcbddc", "#dadaeb", "#636363", "#969696", "#bdbdbd", "#d9d9d9"];
-
             const createLevelHeaders = (root:any) => {
                 const levels = root.height + 1;
                 const levelWidth = width / levels;
@@ -63,11 +58,20 @@ const Tree = ({data} : {data: any}) => {
                     headerGroup
                         .append("text")
                         .attr("x", i * levelWidth + levelWidth / 2)
-                        .attr("y", 10)
-                        .attr("fill", levelColors[i % levelColors.length])
+                        .attr("y", -50)
+                        .attr("fill", 'black')
                         .attr("font-weight", "bold")
                         .attr("text-anchor", "middle")
                         .text(`Level ${i + 1}`);
+
+                    headerGroup
+                        .append("line")
+                        .attr("x1", i * levelWidth + 20)
+                        .attr("y1", -30)
+                        .attr("x2", (i + 1) * levelWidth - 20)
+                        .attr("y2", -30)
+                        .attr("stroke", "black")
+                        .attr("stroke-width", "2px");
 
                     svg
                         .append("title")
@@ -87,18 +91,18 @@ const Tree = ({data} : {data: any}) => {
                 backgroundGroup
                     .append("rect")
                     .attr("x", 0)
-                    .attr("y", 0)
+                    .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2)
+                    .attr("height", height * 2 + 100)
                     .attr("fill", "white")
                     .lower();
 
                 backgroundGroup
                     .append("rect")
                     .attr("x", levelWidth)
-                    .attr("y", 0)
+                    .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2)
+                    .attr("height", height * 2 + 100)
                     .attr("fill", "#52B87F")
                     .attr('opacity', 0.1)
                     .lower();
@@ -106,9 +110,9 @@ const Tree = ({data} : {data: any}) => {
                 backgroundGroup
                     .append("rect")
                     .attr("x", levelWidth * 2)
-                    .attr("y", 0)
+                    .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2)
+                    .attr("height", height * 2 + 100)
                     .attr("fill", "#EEEEEE")
                     .attr('opacity', 0.5)
                     .lower();
@@ -116,9 +120,9 @@ const Tree = ({data} : {data: any}) => {
                 backgroundGroup
                     .append("rect")
                     .attr("x", levelWidth * 3)
-                    .attr("y", 0)
+                    .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2)
+                    .attr("height", height * 2 + 100)
                     .attr("fill", "#EEEEEE")
                     .attr('opacity', 0.25)
                     .lower();
@@ -140,6 +144,7 @@ const Tree = ({data} : {data: any}) => {
                 });
 
                 treeLayout(root);
+
 
                 const transition = svg
                     .transition()
@@ -238,7 +243,7 @@ const Tree = ({data} : {data: any}) => {
 
 
     return(
-        <div ref={wrapperRef} style={{height: '100%', width:'100%', margin: 'auto'}} />
+        <div ref={wrapperRef} style={{height: '100%', width:'100%', position: "relative"}}/>
     )
 }
 

@@ -893,7 +893,7 @@ const DATA = {
 function App() {
   return (
     <div style={{height: '100vh', width:'100wh'}}>
-      <Tree data={DATA} />
+        <Tree data={DATA} />
     </div>
   );
 }

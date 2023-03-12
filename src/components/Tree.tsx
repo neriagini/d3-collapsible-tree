@@ -35,6 +35,9 @@ const Tree = ({data} : {data: any}) => {
             const root = hierarchy(treeData);
             const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
             let height = root.descendants().length * 20;
+             // const treeHeight = root.descendants().length * 20;
+            // const wrapperHeight = wrapperRef.current.clientHeight - 100;
+            // let height = Math.max(treeHeight + 100, wrapperHeight);
             root.descendants().forEach((d:CustomNode, i) => {
                 // @ts-ignore
                 d.id = i;
@@ -175,6 +178,7 @@ const Tree = ({data} : {data: any}) => {
                 });
 
                 height = nodes.length * 20 + 100;
+                // let height = Math.max(nodes.length * 20 + 100, wrapperHeight);
 
                 const treeLayout = tree().size([height, width]);
                 treeLayout(root);
@@ -304,16 +308,16 @@ const Tree = ({data} : {data: any}) => {
         setShowContextMenu(false);
     }
     return(
-        <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}>
-            {showContextMenu && (
-                <div style={{ position: "absolute", left: contextMenuPosition.x, top: contextMenuPosition.y, display:'flex', flexDirection: 'row', gap:10, padding: 10, borderRadius: 5, backgroundColor: 'white' }}>
-                    <img src={trash} />
-                    <img src={add}/>
-                    <img src={exchange}/>
-                    <img src={edit}/>
-                </div>
-            )}
-        </div>
+            <div ref={wrapperRef} style={{position:'relative', height: '100%', overflow:'auto', paddingLeft:'200px', paddingTop:'100px'}}>
+                {showContextMenu && (
+                    <div style={{ position: "absolute", left: contextMenuPosition.x, top: contextMenuPosition.y, display:'flex', flexDirection: 'row', gap:10, padding: 10, borderRadius: 5, backgroundColor: 'white' }}>
+                        <img src={trash} />
+                        <img src={add}/>
+                        <img src={exchange}/>
+                        <img src={edit}/>
+                    </div>
+                )}
+            </div>
     )
 }
 

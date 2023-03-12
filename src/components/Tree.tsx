@@ -52,8 +52,12 @@ const Tree = ({data} : {data: any}) => {
                 .append('svg')
                 .attr(
                     "viewBox",
-                    `-200 -100 ${width + 250} ${height + 100}`
+                    `0 -100 ${width} ${height + 100}`
                 )
+                // .attr(
+                //     "viewBox",
+                //     `-200 -100 ${width + 250} ${height + 100}`
+                // )
                 .classed("svg-content-responsive", true)
 
             const gLink = svg
@@ -90,7 +94,7 @@ const Tree = ({data} : {data: any}) => {
                         .attr("x2", (i + 1) * levelWidth - 20)
                         .attr("y2", -30)
                         .attr("stroke", "black")
-                        .attr("stroke-width", "2px");
+                        .attr("stroke-width", "1px");
 
                     svg
                         .append("title")
@@ -180,13 +184,23 @@ const Tree = ({data} : {data: any}) => {
                     .duration(duration)
                     .tween(
                         "resize",
+                        // TODO - next line might not be needed
                         // @ts-ignore
                         window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
                     );
 
                 createLevelBackgrounds(root)
 
+                // maintain persistent equal width for all levels
                 nodes.forEach(function(d:any) { d.y = d.depth * width/ 4; });
+
+                // adjusting levels locations
+                nodes.forEach(function(d:any) {
+                    if (d.depth === 0) d.y += width/4;
+                    if (d.depth === 1) d.y += width / 4;
+                    if (d.depth === 2) d.y += width / 8;
+                });
+
                 // Update the nodes…
                 const node = gNode.selectAll("g").data(nodes, (d:any) => d.id);
 
@@ -217,8 +231,8 @@ const Tree = ({data} : {data: any}) => {
                 nodeEnter
                     .append("text")
                     .attr("dy", "0.31em")
-                    .attr("x", (d:any) => (d._children ? -6 : 6))
-                    .attr("text-anchor", (d:any) => (d._children ? "end" : "start"))
+                    .attr("x", (d:any) => (d._children || d.depth === 1 ? -6 : 6))
+                    .attr("text-anchor", (d:any) => (d._children || d.depth === 1 ? "end" : "start"))
                     .text((d:any) => d.data.name)
                     .clone(true)
                     .lower()

@@ -6,14 +6,15 @@ const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
+    const diagonal = linkHorizontal()
+        .x((d: any) => d.y ? d.y : 0)
+        .y((d: any) => d.x ? d.x : 0);
 
     useEffect(() => {
         if (wrapperRef.current && treeData) {
             const root = hierarchy(treeData);
             const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
             let height = root.descendants().length * 20;
-            const treeLayout = tree().size([height, width]);
-            const diagonal = linkHorizontal().x((d: any) => d.y).y((d: any) => d.x);
 
             root.descendants().forEach((d, i) => {
                 // @ts-ignore
@@ -22,7 +23,6 @@ const Tree = ({data} : {data: any}) => {
                 d._children = d.children;
             });
 
-            treeLayout(root);
 
             const svgElement = wrapperRef.current.querySelector('svg');
             if (svgElement) {
@@ -83,13 +83,11 @@ const Tree = ({data} : {data: any}) => {
             };
 
             const createLevelBackgrounds = (root:any) => {
-
                 const existingBackgroundGroup = svg.select('#background-group');
                 if (existingBackgroundGroup) {
                     // remove the existing background group
                     existingBackgroundGroup.remove();
                 }
-
                 const levels = root.height + 1;
                 const levelWidth = width / levels;
                 const backgroundGroup = svg.insert("g", ":first-child")

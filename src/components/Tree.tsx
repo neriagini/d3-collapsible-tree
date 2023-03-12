@@ -1,6 +1,19 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, linkHorizontal, select, tree} from 'd3';
+import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
+
+interface CustomNode extends HierarchyNode<any> {
+    _children?: CustomNode[];
+}
+
+interface ISVGElement {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fill: string;
+    opacity: number;
+}
 
 const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -15,11 +28,9 @@ const Tree = ({data} : {data: any}) => {
             const root = hierarchy(treeData);
             const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
             let height = root.descendants().length * 20;
-
-            root.descendants().forEach((d, i) => {
+            root.descendants().forEach((d:CustomNode, i) => {
                 // @ts-ignore
                 d.id = i;
-                // @ts-ignore
                 d._children = d.children;
             });
 
@@ -50,7 +61,7 @@ const Tree = ({data} : {data: any}) => {
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all");
 
-            const createLevelHeaders = (root:any) => {
+            const createLevelHeaders = (root: any) => {
                 const levels = root.height + 1;
                 const levelWidth = width / levels;
                 const headerGroup = svg.append("g");
@@ -82,8 +93,8 @@ const Tree = ({data} : {data: any}) => {
                 }
             };
 
-            const createLevelBackgrounds = (root:any) => {
-                let backgroundGroup:any = svg.select('#background-group');
+            const createLevelBackgrounds = (root: any) => {
+                let backgroundGroup: any = svg.select('#background-group');
                 const levels = root.height + 1;
                 const levelWidth = width / levels;
 
@@ -129,18 +140,18 @@ const Tree = ({data} : {data: any}) => {
                         }
                     ])
                     .join('rect')
-                    .attr('x', (d:any) => d.x)
-                    .attr('y', (d:any) => d.y)
-                    .attr('width', (d:any) => d.width)
-                    .attr('height', (d:any) => d.height)
-                    .attr('fill', (d:any) => d.fill)
-                    .attr('opacity', (d:any) => d.opacity)
+                    .attr('x', (d: ISVGElement) =>  d.x)
+                    .attr('y', (d:ISVGElement) => d.y)
+                    .attr('width', (d:ISVGElement) => d.width)
+                    .attr('height', (d:ISVGElement) => d.height)
+                    .attr('fill', (d:ISVGElement) => d.fill)
+                    .attr('opacity', (d:ISVGElement) => d.opacity)
                     .lower();
             };
 
             createLevelHeaders(root);
 
-            const update = (source:any) => {
+            const update = (source: any) => {
                 const duration = 500;
                 const nodes = root.descendants().reverse();
                 const links = root.links();
@@ -153,6 +164,7 @@ const Tree = ({data} : {data: any}) => {
                 });
 
                 height = nodes.length * 20;
+
                 const treeLayout = tree().size([height, width]);
                 treeLayout(root);
 

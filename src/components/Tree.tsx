@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, linkHorizontal, map, max, min, scaleOrdinal, select, tree, treemap} from 'd3';
+import {hierarchy, linkHorizontal, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
 
 const Tree = ({data} : {data: any}) => {

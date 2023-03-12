@@ -1,6 +1,10 @@
 import React, {useEffect, useRef, useState} from "react";
 import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
+import edit from '../assets/edit.svg';
+import trash from '../assets/trash.svg';
+import add from '../assets/add.svg';
+import exchange from '../assets/exchange.svg';
 
 interface CustomNode extends HierarchyNode<any> {
     _children?: CustomNode[];
@@ -19,6 +23,9 @@ const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
+    const [showContextMenu, setShowContextMenu] = useState(false);
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+
     const diagonal = linkHorizontal()
         .x((d: any) => d.y ? d.y : 0)
         .y((d: any) => d.x ? d.x : 0);
@@ -193,6 +200,12 @@ const Tree = ({data} : {data: any}) => {
                     .on("click", (event, d:any) => {
                         d.children = d.children ? null : d._children;
                         update(d);
+                        setShowContextMenu(false);
+                    })
+                    .on("contextmenu", (event) => {
+                        event.preventDefault(); // prevent default context menu from showing up
+                        setShowContextMenu(true);
+                        setContextMenuPosition({ x: event.pageX + 5, y: event.pageY - 45 });
                     });
 
                 nodeEnter
@@ -265,9 +278,26 @@ const Tree = ({data} : {data: any}) => {
         }
     } ,[treeData, dimensions])
 
+    function handleContextMenu(event: any) {
+        event.preventDefault(); // prevent default context menu from showing up
+        setShowContextMenu(true);
+        setContextMenuPosition({ x: event.clientX, y: event.clientY });
+    }
 
+    function handleContextMenuClose() {
+        setShowContextMenu(false);
+    }
     return(
-        <div ref={wrapperRef} style={{height: '100%', width:'100%', position: "relative"}}/>
+        <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}>
+            {showContextMenu && (
+                <div style={{ position: "absolute", left: contextMenuPosition.x, top: contextMenuPosition.y, display:'flex', flexDirection: 'row', gap:10, padding: 10, borderRadius: 5, backgroundColor: 'white' }}>
+                    <img src={trash} />
+                    <img src={add}/>
+                    <img src={exchange}/>
+                    <img src={edit}/>
+                </div>
+            )}
+        </div>
     )
 }
 

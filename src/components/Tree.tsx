@@ -6,11 +6,12 @@ const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
+
     useEffect(() => {
         if (wrapperRef.current && treeData) {
             const root = hierarchy(treeData);
             const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
-            const height = root.descendants().length * 10;
+            let height = root.descendants().length * 20;
             const treeLayout = tree().size([height, width]);
             const diagonal = linkHorizontal().x((d: any) => d.y).y((d: any) => d.x);
 
@@ -26,7 +27,7 @@ const Tree = ({data} : {data: any}) => {
             const svgElement = wrapperRef.current.querySelector('svg');
             if (svgElement) {
                 // SVG element already exists in DOM, no need to append a new one
-                return;
+               svgElement.remove();
             }
 
             const svg = select(wrapperRef.current)
@@ -81,19 +82,25 @@ const Tree = ({data} : {data: any}) => {
                 }
             };
 
-            createLevelHeaders(root);
-
             const createLevelBackgrounds = (root:any) => {
+
+                const existingBackgroundGroup = svg.select('#background-group');
+                if (existingBackgroundGroup) {
+                    // remove the existing background group
+                    existingBackgroundGroup.remove();
+                }
+
                 const levels = root.height + 1;
                 const levelWidth = width / levels;
-                const backgroundGroup = svg.insert("g", ":first-child");
+                const backgroundGroup = svg.insert("g", ":first-child")
+                    .attr('id', 'background-group');
 
                 backgroundGroup
                     .append("rect")
                     .attr("x", 0)
                     .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2 + 100)
+                    .attr("height", height + 100)
                     .attr("fill", "white")
                     .lower();
 
@@ -102,7 +109,7 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", levelWidth)
                     .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2 + 100)
+                    .attr("height", height + 100)
                     .attr("fill", "#52B87F")
                     .attr('opacity', 0.1)
                     .lower();
@@ -112,7 +119,7 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", levelWidth * 2)
                     .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2 + 100)
+                    .attr("height", height + 100)
                     .attr("fill", "#EEEEEE")
                     .attr('opacity', 0.5)
                     .lower();
@@ -122,13 +129,12 @@ const Tree = ({data} : {data: any}) => {
                     .attr("x", levelWidth * 3)
                     .attr("y", -100)
                     .attr("width", levelWidth)
-                    .attr("height", height * 2 + 100)
+                    .attr("height", height + 100)
                     .attr("fill", "#EEEEEE")
                     .attr('opacity', 0.25)
                     .lower();
             };
 
-            createLevelBackgrounds(root)
             createLevelHeaders(root);
 
             const update = (source:any) => {
@@ -143,6 +149,8 @@ const Tree = ({data} : {data: any}) => {
                     if (node.x > right.x) right = node;
                 });
 
+                height = nodes.length * 20;
+                const treeLayout = tree().size([height, width]);
                 treeLayout(root);
 
                 const transition = svg
@@ -153,6 +161,8 @@ const Tree = ({data} : {data: any}) => {
                         // @ts-ignore
                         window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
                     );
+
+                createLevelBackgrounds(root)
 
                 nodes.forEach(function(d:any) { d.y = d.depth * width/ 4; });
                 // Update the nodes…

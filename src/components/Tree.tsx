@@ -83,53 +83,58 @@ const Tree = ({data} : {data: any}) => {
             };
 
             const createLevelBackgrounds = (root:any) => {
-                const existingBackgroundGroup = svg.select('#background-group');
-                if (existingBackgroundGroup) {
-                    // remove the existing background group
-                    existingBackgroundGroup.remove();
-                }
+                let backgroundGroup:any = svg.select('#background-group');
                 const levels = root.height + 1;
                 const levelWidth = width / levels;
-                const backgroundGroup = svg.insert("g", ":first-child")
-                    .attr('id', 'background-group');
+
+                if (backgroundGroup.empty()) {
+                    // create the background group if it doesn't exist
+                    backgroundGroup = svg.insert("g", ":first-child")
+                        .attr('id', 'background-group');
+                }
 
                 backgroundGroup
-                    .append("rect")
-                    .attr("x", 0)
-                    .attr("y", -100)
-                    .attr("width", levelWidth)
-                    .attr("height", height + 100)
-                    .attr("fill", "white")
-                    .lower();
-
-                backgroundGroup
-                    .append("rect")
-                    .attr("x", levelWidth)
-                    .attr("y", -100)
-                    .attr("width", levelWidth)
-                    .attr("height", height + 100)
-                    .attr("fill", "#52B87F")
-                    .attr('opacity', 0.1)
-                    .lower();
-
-                backgroundGroup
-                    .append("rect")
-                    .attr("x", levelWidth * 2)
-                    .attr("y", -100)
-                    .attr("width", levelWidth)
-                    .attr("height", height + 100)
-                    .attr("fill", "#EEEEEE")
-                    .attr('opacity', 0.5)
-                    .lower();
-
-                backgroundGroup
-                    .append("rect")
-                    .attr("x", levelWidth * 3)
-                    .attr("y", -100)
-                    .attr("width", levelWidth)
-                    .attr("height", height + 100)
-                    .attr("fill", "#EEEEEE")
-                    .attr('opacity', 0.25)
+                    .selectAll('rect')
+                    .data([{
+                        x: 0,
+                        y: -100,
+                        width: levelWidth,
+                        height: height + 100,
+                        fill: 'white',
+                        opacity: 1
+                        },
+                        {
+                            x: levelWidth,
+                            y: -100,
+                            width: levelWidth,
+                            height: height + 100,
+                            fill: '#52B87F',
+                            opacity: 0.1
+                        },
+                        {
+                            x: levelWidth * 2,
+                            y: -100,
+                            width: levelWidth,
+                            height: height + 100,
+                            fill: '#EEEEEE',
+                            opacity: 0.5
+                        },
+                        {
+                            x: levelWidth * 3,
+                            y: -100,
+                            width: levelWidth,
+                            height: height + 100,
+                            fill: '#EEEEEE',
+                            opacity: 0.25
+                        }
+                    ])
+                    .join('rect')
+                    .attr('x', (d:any) => d.x)
+                    .attr('y', (d:any) => d.y)
+                    .attr('width', (d:any) => d.width)
+                    .attr('height', (d:any) => d.height)
+                    .attr('fill', (d:any) => d.fill)
+                    .attr('opacity', (d:any) => d.opacity)
                     .lower();
             };
 

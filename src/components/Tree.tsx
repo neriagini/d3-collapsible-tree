@@ -1,17 +1,17 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, linkHorizontal, map, max, min, scaleOrdinal, select, tree} from 'd3';
+import {hierarchy, linkHorizontal, map, max, min, scaleOrdinal, select, tree, treemap} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
 
 const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
-
     useEffect(() => {
         if (wrapperRef.current && treeData) {
-            const {width, height} = dimensions || wrapperRef.current.getBoundingClientRect();
             const root = hierarchy(treeData);
-            const treeLayout = tree().size([height * 2, width])
+            const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
+            const height = root.descendants().length * 5;
+            const treeLayout = tree().size([height * 2, width]);
             const diagonal = linkHorizontal().x((d: any) => d.y).y((d: any) => d.x);
 
             root.descendants().forEach((d, i) => {
@@ -144,7 +144,6 @@ const Tree = ({data} : {data: any}) => {
                 });
 
                 treeLayout(root);
-
 
                 const transition = svg
                     .transition()

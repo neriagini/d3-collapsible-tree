@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
+import { hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
 import edit from '../assets/edit.svg';
 import trash from '../assets/trash.svg';
@@ -120,15 +120,15 @@ const Tree = ({data} : {data: any}) => {
                     .data([{
                         x: 0,
                         y: -100,
-                        width: levelWidth,
+                        width: levelWidth - 10,
                         height: height + 100,
-                        fill: 'white',
+                        fill: '#FAFAFA',
                         opacity: 1
                         },
                         {
                             x: levelWidth,
                             y: -100,
-                            width: levelWidth,
+                            width: levelWidth - 10,
                             height: height + 100,
                             fill: '#52B87F',
                             opacity: 0.1
@@ -136,7 +136,7 @@ const Tree = ({data} : {data: any}) => {
                         {
                             x: levelWidth * 2,
                             y: -100,
-                            width: levelWidth,
+                            width: levelWidth - 10,
                             height: height + 100,
                             fill: '#EEEEEE',
                             opacity: 0.5
@@ -144,7 +144,7 @@ const Tree = ({data} : {data: any}) => {
                         {
                             x: levelWidth * 3,
                             y: -100,
-                            width: levelWidth,
+                            width: levelWidth - 10,
                             height: height + 100,
                             fill: '#EEEEEE',
                             opacity: 0.25
@@ -174,10 +174,13 @@ const Tree = ({data} : {data: any}) => {
                     if (node.x > right.x) right = node;
                 });
 
-                height = nodes.length * 20;
+                height = nodes.length * 20 + 100;
 
                 const treeLayout = tree().size([height, width]);
                 treeLayout(root);
+
+                createLevelBackgrounds(root)
+                svg.attr("viewBox", `0 -100 ${width} ${height + 100}`);
 
                 const transition = svg
                     .transition()
@@ -189,16 +192,15 @@ const Tree = ({data} : {data: any}) => {
                         window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
                     );
 
-                createLevelBackgrounds(root)
-
                 // maintain persistent equal width for all levels
                 nodes.forEach(function(d:any) { d.y = d.depth * width/ 4; });
 
                 // adjusting levels locations
                 nodes.forEach(function(d:any) {
-                    if (d.depth === 0) d.y += width/4;
-                    if (d.depth === 1) d.y += width / 4;
+                    if (d.depth === 0) d.y += width/4 - 15;
+                    if (d.depth === 1) d.y += width / 4 - 15;
                     if (d.depth === 2) d.y += width / 8;
+                    if (d.depth === 3) d.y += 10;
                 });
 
                 // Update the nodes…

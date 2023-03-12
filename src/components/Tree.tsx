@@ -10,8 +10,8 @@ const Tree = ({data} : {data: any}) => {
         if (wrapperRef.current && treeData) {
             const root = hierarchy(treeData);
             const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
-            const height = root.descendants().length * 5;
-            const treeLayout = tree().size([height * 2, width]);
+            const height = root.descendants().length * 10;
+            const treeLayout = tree().size([height, width]);
             const diagonal = linkHorizontal().x((d: any) => d.y).y((d: any) => d.x);
 
             root.descendants().forEach((d, i) => {
@@ -33,7 +33,7 @@ const Tree = ({data} : {data: any}) => {
                 .append('svg')
                 .attr(
                     "viewBox",
-                    `-200 -100 ${width + 250} ${height * 2 + 100}`
+                    `-200 -100 ${width + 250} ${height + 100}`
                 )
                 .classed("svg-content-responsive", true)
 

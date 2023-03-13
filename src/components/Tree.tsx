@@ -208,8 +208,10 @@ const Tree = ({data} : {data: any}) => {
             const update = (source: any) => {
 
                 const duration = 500;
-                let nodes = root.descendants().reverse();
-                let links = root.links();
+                // @ts-ignore
+                let nodes = root.descendants().reverse().filter(node => !node.deleted);
+                // @ts-ignore
+                let links = root.links().filter(link => !link.target.deleted);
                 // Compute the new tree layout.
                 let left:any = root;
                 let right:any = root;
@@ -219,10 +221,7 @@ const Tree = ({data} : {data: any}) => {
                 });
 
 
-                // @ts-ignore
-                links = links.filter(link => !link.target.deleted)
-                // @ts-ignore
-                nodes = nodes.filter(node => !node.deleted)
+
 
                 height = Math.max(nodes.length * 10 + 100,wrapperRef.current ? wrapperRef.current.clientHeight: 0);
                 // height = nodes.length * 20 + 100;

@@ -19,6 +19,11 @@ interface ISVGElement {
     opacity: number;
 }
 
+interface IData {
+    name: string;
+    id: string;
+    children: IData[];
+}
 const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
@@ -34,7 +39,7 @@ const Tree = ({data} : {data: any}) => {
         if (wrapperRef.current && treeData) {
             const root = hierarchy(treeData);
             const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
-            let height = root.descendants().length * 20;
+            let height = root.descendants().length * 10;
              // const treeHeight = root.descendants().length * 20;
             // const wrapperHeight = wrapperRef.current.clientHeight - 100;
             // let height = Math.max(treeHeight + 100, wrapperHeight);
@@ -177,7 +182,7 @@ const Tree = ({data} : {data: any}) => {
                     if (node.x > right.x) right = node;
                 });
 
-                height = nodes.length * 20 + 100;
+                height = nodes.length * 10 + 100;
                 // let height = Math.max(nodes.length * 20 + 100, wrapperHeight);
 
                 const treeLayout = tree().size([height, width]);
@@ -308,7 +313,7 @@ const Tree = ({data} : {data: any}) => {
         setShowContextMenu(false);
     }
     return(
-            <div ref={wrapperRef} style={{position:'relative', height: '100%', overflow:'auto', paddingLeft:'200px', paddingTop:'100px'}}>
+            <div ref={wrapperRef} style={{position:'relative', height: '100%', overflow:'auto'}}>
                 {showContextMenu && (
                     <div style={{ position: "absolute", left: contextMenuPosition.x, top: contextMenuPosition.y, display:'flex', flexDirection: 'row', gap:10, padding: 10, borderRadius: 5, backgroundColor: 'white' }}>
                         <img src={trash} />

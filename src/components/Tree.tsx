@@ -77,6 +77,7 @@ const Tree = ({data} : {data: any}) => {
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all");
 
+
             const createLevelHeaders = (root: any) => {
                 const levels: number = root.height + 1;
                 const levelWidth = width / levels;
@@ -112,6 +113,7 @@ const Tree = ({data} : {data: any}) => {
             const createLevelBackgrounds = (root: any) => {
                 let backgroundGroup: any = svg.select('#background-group');
                 const levels = root.height + 1;
+
                 const levelWidth = width / levels;
 
                 if (backgroundGroup.empty()) {
@@ -229,6 +231,7 @@ const Tree = ({data} : {data: any}) => {
                 treeLayout(root);
 
                 createLevelBackgrounds(root)
+
                 svg
                     .attr('height', height)
                     .attr("viewBox", `0 -100 ${width} ${height + 100}`)

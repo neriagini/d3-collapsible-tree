@@ -33,7 +33,7 @@ const Tree = ({data} : {data: any}) => {
     const menuRef = useRef<HTMLDivElement>(null);
     const [showContextMenu, setShowContextMenu] =  useClickOutside(menuRef);
     const [focusedNode, setFocusedNode] = useState<any>(null);
-
+    const [deletedNodes, setDeletedNodes] = useState<any>([])
 
     const diagonal = linkHorizontal()
         .x((d: any) => d.y ? d.y : 0)
@@ -51,6 +51,8 @@ const Tree = ({data} : {data: any}) => {
                 // @ts-ignore
                 d.id = i;
                 d._children = d.children;
+                // @ts-ignore
+                d.deleted = false;
             });
 
 
@@ -61,6 +63,54 @@ const Tree = ({data} : {data: any}) => {
             }
 
             const svg = select(wrapperRef.current).append('svg')
+
+            const iconGroup = svg.append('g')
+                .attr('transform', 'translate(50, 25)')
+
+            iconGroup.append('rect')
+                .attr('width', 200)
+                .attr('height', 50)
+                .attr('rx', 5) // Add a border radius of 5 pixels
+                .attr('fill', 'white')
+                .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
+
+
+            iconGroup.append('image')
+                .attr('href', trash)
+                .attr('x', 10)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+            iconGroup.append('image')
+                .attr('href', add)
+                .attr('x', 60)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+            iconGroup.append('image')
+                .attr('href', exchange)
+                .attr('x', 110)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+            iconGroup.append('image')
+                .attr('href', edit)
+                .attr('x', 160)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
 
             const gLink = svg
                 .append("g")
@@ -292,7 +342,13 @@ const Tree = ({data} : {data: any}) => {
             // found the object with the given ID, remove it from its parent's children array
             const parent = getParentNode(id, tree);
             if (parent) {
-                 parent.children = parent.children.filter((child:any) => child.id !== id);
+                 parent.children = parent.children.map((child:any) => {
+                     if (child.id === id) {
+                         child.deleted = true
+                     }
+                     return child
+                 });
+                console.log(data)
             }
         } else {
             // recursively search for the object with the given ID
@@ -318,9 +374,7 @@ const Tree = ({data} : {data: any}) => {
     }
 
     const handleDeleteNode = () => {
-        const tree = {...treeData};
-         deleteObjectById(focusedNode.data.id,tree, tree)
-        setTreeData(tree)
+         deleteObjectById(focusedNode.data.id,data, data)
         setShowContextMenu(false);
     }
     return(

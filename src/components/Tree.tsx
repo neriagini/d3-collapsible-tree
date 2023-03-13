@@ -5,6 +5,7 @@ import edit from '../assets/edit.svg';
 import trash from '../assets/trash.svg';
 import add from '../assets/add.svg';
 import exchange from '../assets/exchange.svg';
+import useClickOutside from "../hooks/useClickOutside";
 
 interface CustomNode extends HierarchyNode<any> {
     _children?: CustomNode[];
@@ -28,8 +29,11 @@ const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dimensions = useResizeObserver(wrapperRef);
     const [treeData, setTreeData] = useState(data);
-    const [showContextMenu, setShowContextMenu] = useState(false);
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const menuRef = useRef<HTMLDivElement>(null);
+    const [showContextMenu, setShowContextMenu] =  useClickOutside(menuRef);
+
+
 
     const diagonal = linkHorizontal()
         .x((d: any) => d.y ? d.y : 0)
@@ -38,11 +42,12 @@ const Tree = ({data} : {data: any}) => {
     useEffect(() => {
         if (wrapperRef.current && treeData) {
             const root = hierarchy(treeData);
-            const {width} = dimensions || wrapperRef.current.getBoundingClientRect();
-            let height = root.descendants().length * 10;
-             // const treeHeight = root.descendants().length * 20;
-            // const wrapperHeight = wrapperRef.current.clientHeight - 100;
-            // let height = Math.max(treeHeight + 100, wrapperHeight);
+            // let {width} = dimensions || wrapperRef.current.getBoundingClientRect();
+            // let height = root.descendants().length * 10;
+            let width = (root.height + 1) * 400;
+             const treeHeight = root.descendants().length * 20;
+            const wrapperHeight = wrapperRef.current.clientHeight - 100;
+            let height =  wrapperHeight
             root.descendants().forEach((d:CustomNode, i) => {
                 // @ts-ignore
                 d.id = i;
@@ -56,17 +61,7 @@ const Tree = ({data} : {data: any}) => {
                svgElement.remove();
             }
 
-            const svg = select(wrapperRef.current)
-                .append('svg')
-                .attr(
-                    "viewBox",
-                    `0 -100 ${width} ${height + 100}`
-                )
-                // .attr(
-                //     "viewBox",
-                //     `-200 -100 ${width + 250} ${height + 100}`
-                // )
-                .classed("svg-content-responsive", true)
+            const svg = select(wrapperRef.current).append('svg')
 
             const gLink = svg
                 .append("g")
@@ -81,7 +76,7 @@ const Tree = ({data} : {data: any}) => {
                 .attr("pointer-events", "all");
 
             const createLevelHeaders = (root: any) => {
-                const levels = root.height + 1;
+                const levels: number = root.height + 1;
                 const levelWidth = width / levels;
                 const headerGroup = svg.append("g");
 
@@ -123,41 +118,23 @@ const Tree = ({data} : {data: any}) => {
                         .attr('id', 'background-group');
                 }
 
+                const data = [];
+                for (let i = 0; i < levels; i++) {
+                    data.push(
+                        {
+                            x: levelWidth * i,
+                            y: -100,
+                            width: levelWidth - 10,
+                            height: height + 100,
+                            fill: 'green',
+                            opacity: 0.05
+                        }
+                    )
+                }
+
                 backgroundGroup
                     .selectAll('rect')
-                    .data([{
-                        x: 0,
-                        y: -100,
-                        width: levelWidth - 10,
-                        height: height + 100,
-                        fill: '#FAFAFA',
-                        opacity: 1
-                        },
-                        {
-                            x: levelWidth,
-                            y: -100,
-                            width: levelWidth - 10,
-                            height: height + 100,
-                            fill: '#52B87F',
-                            opacity: 0.1
-                        },
-                        {
-                            x: levelWidth * 2,
-                            y: -100,
-                            width: levelWidth - 10,
-                            height: height + 100,
-                            fill: '#EEEEEE',
-                            opacity: 0.5
-                        },
-                        {
-                            x: levelWidth * 3,
-                            y: -100,
-                            width: levelWidth - 10,
-                            height: height + 100,
-                            fill: '#EEEEEE',
-                            opacity: 0.25
-                        }
-                    ])
+                    .data(data)
                     .join('rect')
                     .attr('x', (d: ISVGElement) =>  d.x)
                     .attr('y', (d:ISVGElement) => d.y)
@@ -182,14 +159,17 @@ const Tree = ({data} : {data: any}) => {
                     if (node.x > right.x) right = node;
                 });
 
-                height = nodes.length * 10 + 100;
-                // let height = Math.max(nodes.length * 20 + 100, wrapperHeight);
+                height = Math.max(nodes.length * 10 + 100,wrapperRef.current ? wrapperRef.current.clientHeight: 0);
+                // height = nodes.length * 20 + 100;
 
                 const treeLayout = tree().size([height, width]);
                 treeLayout(root);
 
                 createLevelBackgrounds(root)
-                svg.attr("viewBox", `0 -100 ${width} ${height + 100}`);
+                svg
+                    .attr('height', height)
+                    .attr("viewBox", `0 -100 ${width} ${height + 100}`)
+                    .classed("svg-content-responsive", true)
 
                 const transition = svg
                     .transition()
@@ -202,14 +182,13 @@ const Tree = ({data} : {data: any}) => {
                     );
 
                 // maintain persistent equal width for all levels
-                nodes.forEach(function(d:any) { d.y = d.depth * width/ 4; });
+                nodes.forEach(function(d:any) { d.y = d.depth * width/ (root.height + 1); });
 
                 // adjusting levels locations
                 nodes.forEach(function(d:any) {
-                    if (d.depth === 0) d.y += width/4 - 15;
-                    if (d.depth === 1) d.y += width / 4 - 15;
-                    if (d.depth === 2) d.y += width / 8;
-                    if (d.depth === 3) d.y += 10;
+                    // if (d.depth === 0) d.y += width/(root.height + 1) - 50
+                    if (d.depth !== root.height) d.y += 200
+
                 });
 
                 // Update the nodes…
@@ -242,8 +221,8 @@ const Tree = ({data} : {data: any}) => {
                 nodeEnter
                     .append("text")
                     .attr("dy", "0.31em")
-                    .attr("x", (d:any) => (d._children || d.depth === 1 ? -6 : 6))
-                    .attr("text-anchor", (d:any) => (d._children || d.depth === 1 ? "end" : "start"))
+                    .attr("x", (d:any) => (d._children ? -6 : 6))
+                    .attr("text-anchor", (d:any) => (d._children  ? "end" : "start"))
                     .text((d:any) => d.data.name)
                     .clone(true)
                     .lower()
@@ -299,6 +278,7 @@ const Tree = ({data} : {data: any}) => {
                     d.y0 = d.y;
                 });
             }
+
             update(root);
         }
     } ,[treeData, dimensions])
@@ -313,9 +293,23 @@ const Tree = ({data} : {data: any}) => {
         setShowContextMenu(false);
     }
     return(
-            <div ref={wrapperRef} style={{position:'relative', height: '100%', overflow:'auto'}}>
+            <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}>
                 {showContextMenu && (
-                    <div style={{ position: "absolute", left: contextMenuPosition.x, top: contextMenuPosition.y, display:'flex', flexDirection: 'row', gap:10, padding: 10, borderRadius: 5, backgroundColor: 'white' }}>
+                    <div
+                        ref={menuRef}
+                        style={{
+                            position: "absolute",
+                            left: contextMenuPosition.x,
+                            top: contextMenuPosition.y,
+                            display:'flex',
+                            flexDirection: 'row',
+                            gap:15,
+                            padding: 10,
+                            borderRadius: 5,
+                            backgroundColor: 'white',
+                            boxShadow: '0px 4px 30px rgba(0, 0, 0, 0.2)'
+                        }}
+                    >
                         <img src={trash} />
                         <img src={add}/>
                         <img src={exchange}/>

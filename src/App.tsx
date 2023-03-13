@@ -231,7 +231,74 @@ const DATA = {
     {
       name: 'Frigo 2',
       id: uuidv4(),
-      children: [],
+      children: [
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+        {
+          name: 'Bin Hoist Rework',
+          id: uuidv4(),
+          collapse: false,
+          children: [],
+        },
+      ],
     },
     {
       name: 'Pack Off',

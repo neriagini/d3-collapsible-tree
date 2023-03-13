@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import { hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
+import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
 import edit from '../assets/edit.svg';
 import trash from '../assets/trash.svg';
@@ -32,7 +32,7 @@ const Tree = ({data} : {data: any}) => {
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const menuRef = useRef<HTMLDivElement>(null);
     const [showContextMenu, setShowContextMenu] =  useClickOutside(menuRef);
-
+    const [focusedNode, setFocusedNode] = useState<any>(null);
 
 
     const diagonal = linkHorizontal()
@@ -45,9 +45,8 @@ const Tree = ({data} : {data: any}) => {
             // let {width} = dimensions || wrapperRef.current.getBoundingClientRect();
             // let height = root.descendants().length * 10;
             let width = (root.height + 1) * 400;
-             const treeHeight = root.descendants().length * 20;
-            const wrapperHeight = wrapperRef.current.clientHeight - 100;
-            let height =  wrapperHeight
+            // const treeHeight = root.descendants().length * 20;
+            let height =  wrapperRef.current.clientHeight - 100
             root.descendants().forEach((d:CustomNode, i) => {
                 // @ts-ignore
                 d.id = i;
@@ -204,11 +203,11 @@ const Tree = ({data} : {data: any}) => {
                     .on("click", (event, d:any) => {
                         d.children = d.children ? null : d._children;
                         update(d);
-                        setShowContextMenu(false);
                     })
-                    .on("contextmenu", (event) => {
+                    .on("contextmenu", (event, d) => {
                         event.preventDefault(); // prevent default context menu from showing up
                         setShowContextMenu(true);
+                        setFocusedNode(d)
                         setContextMenuPosition({ x: event.pageX + 5, y: event.pageY - 45 });
                     });
 
@@ -278,7 +277,6 @@ const Tree = ({data} : {data: any}) => {
                     d.y0 = d.y;
                 });
             }
-
             update(root);
         }
     } ,[treeData, dimensions])
@@ -289,7 +287,40 @@ const Tree = ({data} : {data: any}) => {
         setContextMenuPosition({ x: event.clientX, y: event.clientY });
     }
 
-    function handleContextMenuClose() {
+    function deleteObjectById(id:string, obj:any, tree: any) {
+        if (obj.id === id) {
+            // found the object with the given ID, remove it from its parent's children array
+            const parent = getParentNode(id, tree);
+            if (parent) {
+                 parent.children = parent.children.filter((child:any) => child.id !== id);
+            }
+        } else {
+            // recursively search for the object with the given ID
+            obj.children.forEach((child:any) => {
+                deleteObjectById(id, child, tree);
+            });
+        }
+    }
+
+    function getParentNode(id:string, obj:any) {
+        if (obj.children.some((child:any) => child.id === id)) {
+            // found the parent node, return it
+            return obj;
+        } else {
+            // recursively search for the parent node
+            let result = null;
+            obj.children.some((child:any) => {
+                result = getParentNode(id, child);
+                return result !== null;
+            });
+            return result;
+        }
+    }
+
+    const handleDeleteNode = () => {
+        const tree = {...treeData};
+         deleteObjectById(focusedNode.data.id,tree, tree)
+        setTreeData(tree)
         setShowContextMenu(false);
     }
     return(
@@ -303,17 +334,17 @@ const Tree = ({data} : {data: any}) => {
                             top: contextMenuPosition.y,
                             display:'flex',
                             flexDirection: 'row',
-                            gap:15,
+                            gap: 15,
                             padding: 10,
                             borderRadius: 5,
                             backgroundColor: 'white',
                             boxShadow: '0px 4px 30px rgba(0, 0, 0, 0.2)'
                         }}
                     >
-                        <img src={trash} />
-                        <img src={add}/>
-                        <img src={exchange}/>
-                        <img src={edit}/>
+                        <img onClick={handleDeleteNode} src={trash} alt='trash'/>
+                        <img src={add} alt='add'/>
+                        <img src={exchange} alt='exchange'/>
+                        <img src={edit} alt='edit'/>
                     </div>
                 )}
             </div>

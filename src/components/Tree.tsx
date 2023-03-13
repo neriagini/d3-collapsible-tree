@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
+import {hierarchy, HierarchyNode, linkHorizontal, pointer, select, tree} from 'd3';
 import useResizeObserver from '../hooks/useResizeObserver';
 import edit from '../assets/edit.svg';
 import trash from '../assets/trash.svg';
@@ -32,8 +32,8 @@ const Tree = ({data} : {data: any}) => {
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const menuRef = useRef<HTMLDivElement>(null);
     const [showContextMenu, setShowContextMenu] =  useClickOutside(menuRef);
-    const [focusedNode, setFocusedNode] = useState<any>(null);
-    const [deletedNodes, setDeletedNodes] = useState<any>([])
+    // const [focusedNode, setFocusedNode] = useState<any>(null);
+    // const [deletedNodes, setDeletedNodes] = useState<any>([])
 
     const diagonal = linkHorizontal()
         .x((d: any) => d.y ? d.y : 0)
@@ -55,6 +55,7 @@ const Tree = ({data} : {data: any}) => {
                 d.deleted = false;
             });
 
+            let selected:any;
 
             const svgElement = wrapperRef.current.querySelector('svg');
             if (svgElement) {
@@ -63,54 +64,6 @@ const Tree = ({data} : {data: any}) => {
             }
 
             const svg = select(wrapperRef.current).append('svg')
-
-            const iconGroup = svg.append('g')
-                .attr('transform', 'translate(50, 25)')
-
-            iconGroup.append('rect')
-                .attr('width', 200)
-                .attr('height', 50)
-                .attr('rx', 5) // Add a border radius of 5 pixels
-                .attr('fill', 'white')
-                .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
-
-
-            iconGroup.append('image')
-                .attr('href', trash)
-                .attr('x', 10)
-                .attr('y', 10)
-                .attr('width', 30)
-                .attr('height', 30)
-                .attr("cursor", "pointer")
-                .attr("pointer-events", "all");
-
-            iconGroup.append('image')
-                .attr('href', add)
-                .attr('x', 60)
-                .attr('y', 10)
-                .attr('width', 30)
-                .attr('height', 30)
-                .attr("cursor", "pointer")
-                .attr("pointer-events", "all");
-
-            iconGroup.append('image')
-                .attr('href', exchange)
-                .attr('x', 110)
-                .attr('y', 10)
-                .attr('width', 30)
-                .attr('height', 30)
-                .attr("cursor", "pointer")
-                .attr("pointer-events", "all");
-
-            iconGroup.append('image')
-                .attr('href', edit)
-                .attr('x', 160)
-                .attr('y', 10)
-                .attr('width', 30)
-                .attr('height', 30)
-                .attr("cursor", "pointer")
-                .attr("pointer-events", "all");
-
 
             const gLink = svg
                 .append("g")
@@ -196,10 +149,65 @@ const Tree = ({data} : {data: any}) => {
 
             createLevelHeaders(root);
 
+            const iconGroup = svg.append('g')
+
+            iconGroup.attr('opacity', 0);
+
+            iconGroup.append('rect')
+                .attr('width', 200)
+                .attr('height', 50)
+                .attr('rx', 5) // Add a border radius of 5 pixels
+                .attr('fill', 'white')
+                .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
+
+            iconGroup.append('image')
+                .attr('href', trash)
+                .attr('x', 10)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all")
+                .on('click' , () => {
+                    selected.deleted = true;
+                    selected.children = selected.children ? null : selected._children;
+                    update(root)
+                    iconGroup.attr('opacity', 0)
+                })
+
+            iconGroup.append('image')
+                .attr('href', add)
+                .attr('x', 60)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+            iconGroup.append('image')
+                .attr('href', exchange)
+                .attr('x', 110)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+            iconGroup.append('image')
+                .attr('href', edit)
+                .attr('x', 160)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all");
+
+
             const update = (source: any) => {
+
                 const duration = 500;
-                const nodes = root.descendants().reverse();
-                const links = root.links();
+                let nodes = root.descendants().reverse();
+                let links = root.links();
                 // Compute the new tree layout.
                 let left:any = root;
                 let right:any = root;
@@ -207,6 +215,12 @@ const Tree = ({data} : {data: any}) => {
                     if (node.x < left.x) left = node;
                     if (node.x > right.x) right = node;
                 });
+
+
+                // @ts-ignore
+                links = links.filter(link => !link.target.deleted)
+                // @ts-ignore
+                nodes = nodes.filter(node => !node.deleted)
 
                 height = Math.max(nodes.length * 10 + 100,wrapperRef.current ? wrapperRef.current.clientHeight: 0);
                 // height = nodes.length * 20 + 100;
@@ -232,7 +246,6 @@ const Tree = ({data} : {data: any}) => {
 
                 // maintain persistent equal width for all levels
                 nodes.forEach(function(d:any) { d.y = d.depth * width/ (root.height + 1); });
-
                 // adjusting levels locations
                 nodes.forEach(function(d:any) {
                     // if (d.depth === 0) d.y += width/(root.height + 1) - 50
@@ -251,14 +264,31 @@ const Tree = ({data} : {data: any}) => {
                     .attr("fill-opacity", 0)
                     .attr("stroke-opacity", 0)
                     .on("click", (event, d:any) => {
+                        selected = d;
                         d.children = d.children ? null : d._children;
                         update(d);
                     })
                     .on("contextmenu", (event, d) => {
                         event.preventDefault(); // prevent default context menu from showing up
                         setShowContextMenu(true);
-                        setFocusedNode(d)
-                        setContextMenuPosition({ x: event.pageX + 5, y: event.pageY - 45 });
+                        selected = d;
+                        // setFocusedNode(d)
+                        // iconGroup.attr('transform', `translate(${event.pageX}, ${event.pageY})`)
+                        // setContextMenuPosition({ x: event.pageX + 5, y: event.pageY - 45 });
+
+                        iconGroup
+                            .attr('opacity', 1)
+                            .attr('transform', () => {
+                            const {x,y} = event
+                            // @ts-ignore
+                            const ctm = svg.node().getScreenCTM();
+                            // @ts-ignore
+                            const newX = (x - ctm.e) / ctm.a;
+                            // @ts-ignore
+                            const newY = (y - ctm.f) / ctm.d;
+                            return `translate(${newX + 10}, ${newY - 60})`;
+                        });
+                        update(root)
                     });
 
                 nodeEnter
@@ -374,33 +404,33 @@ const Tree = ({data} : {data: any}) => {
     }
 
     const handleDeleteNode = () => {
-         deleteObjectById(focusedNode.data.id,data, data)
+         // deleteObjectById(focusedNode.data.id,data, data)
         setShowContextMenu(false);
     }
     return(
             <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}>
-                {showContextMenu && (
-                    <div
-                        ref={menuRef}
-                        style={{
-                            position: "absolute",
-                            left: contextMenuPosition.x,
-                            top: contextMenuPosition.y,
-                            display:'flex',
-                            flexDirection: 'row',
-                            gap: 15,
-                            padding: 10,
-                            borderRadius: 5,
-                            backgroundColor: 'white',
-                            boxShadow: '0px 4px 30px rgba(0, 0, 0, 0.2)'
-                        }}
-                    >
-                        <img onClick={handleDeleteNode} src={trash} alt='trash'/>
-                        <img src={add} alt='add'/>
-                        <img src={exchange} alt='exchange'/>
-                        <img src={edit} alt='edit'/>
-                    </div>
-                )}
+                {/*{showContextMenu && (*/}
+                {/*    <div*/}
+                {/*        ref={menuRef}*/}
+                {/*        style={{*/}
+                {/*            position: "absolute",*/}
+                {/*            left: contextMenuPosition.x,*/}
+                {/*            top: contextMenuPosition.y,*/}
+                {/*            display:'flex',*/}
+                {/*            flexDirection: 'row',*/}
+                {/*            gap: 15,*/}
+                {/*            padding: 10,*/}
+                {/*            borderRadius: 5,*/}
+                {/*            backgroundColor: 'white',*/}
+                {/*            boxShadow: '0px 4px 30px rgba(0, 0, 0, 0.2)'*/}
+                {/*        }}*/}
+                {/*    >*/}
+                {/*        <img onClick={handleDeleteNode} src={trash} alt='trash'/>*/}
+                {/*        <img src={add} alt='add'/>*/}
+                {/*        <img src={exchange} alt='exchange'/>*/}
+                {/*        <img src={edit} alt='edit'/>*/}
+                {/*    </div>*/}
+                {/*)}*/}
             </div>
     )
 }

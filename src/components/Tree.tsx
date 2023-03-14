@@ -162,6 +162,14 @@ const Tree = ({data} : {data: any}) => {
                 .attr('fill', 'white')
                 .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
 
+            const setDeletedRecursively = (node:any) => {
+                if (!node.children) return; // Exit if the node has no children
+                node.children.forEach((child:any) => {
+                    child.deleted = true;
+                    setDeletedRecursively(child); // Recurse through the child's children
+                });
+            }
+
             iconGroup.append('image')
                 .attr('href', trash)
                 .attr('x', 10)
@@ -172,9 +180,13 @@ const Tree = ({data} : {data: any}) => {
                 .attr("pointer-events", "all")
                 .on('click' , () => {
                     selected.deleted = true;
-                    selected.children = selected.children ? null : selected._children;
-                    update(root)
+                    selected.children = null;
+                    setDeletedRecursively(selected)
+                    if (selected.parent.children.every((child:any) => child.deleted)) {
+                        selected.parent.children = null
+                    }
                     iconGroup.attr('opacity', 0)
+                    update(root)
                 })
 
             iconGroup.append('image')
@@ -209,9 +221,11 @@ const Tree = ({data} : {data: any}) => {
 
                 const duration = 500;
                 // @ts-ignore
-                let nodes = root.descendants().reverse().filter(node => !node.deleted);
+                let nodes = root.descendants().filter(node => !node.deleted);
+
                 // @ts-ignore
                 let links = root.links().filter(link => !link.target.deleted);
+
                 // Compute the new tree layout.
                 let left:any = root;
                 let right:any = root;
@@ -220,15 +234,11 @@ const Tree = ({data} : {data: any}) => {
                     if (node.x > right.x) right = node;
                 });
 
-
-
-
                 height = Math.max(nodes.length * 10 + 100,wrapperRef.current ? wrapperRef.current.clientHeight: 0);
                 // height = nodes.length * 20 + 100;
 
                 const treeLayout = tree().size([height, width]);
                 treeLayout(root);
-
                 createLevelBackgrounds(root)
 
                 svg
@@ -267,17 +277,23 @@ const Tree = ({data} : {data: any}) => {
                     .attr("stroke-opacity", 0)
                     .on("click", (event, d:any) => {
                         selected = d;
-                        d.children = d.children ? null : d._children;
+                        console.log(d)
+                        if (d.children) {
+                            d.children = null
+                        } else {
+                            if (d._children && d._children.every((child:any) => child.deleted)) {
+                                d.children = null
+                            } else {
+                                d.children = d._children ? d._children.filter((child:any) => !child.deleted) : null;
+                            }
+                        }
+
                         update(d);
                     })
-                    .on("contextmenu", (event, d) => {
+                    .on("contextmenu", (event, d:any) => {
                         event.preventDefault(); // prevent default context menu from showing up
                         setShowContextMenu(true);
                         selected = d;
-                        // setFocusedNode(d)
-                        // iconGroup.attr('transform', `translate(${event.pageX}, ${event.pageY})`)
-                        // setContextMenuPosition({ x: event.pageX + 5, y: event.pageY - 45 });
-
                         iconGroup
                             .attr('opacity', 1)
                             .attr('transform', () => {

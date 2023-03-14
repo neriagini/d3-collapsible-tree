@@ -32,126 +32,128 @@ const DATA = {
             {
               name: 'DataTable',
               id: uuidv4(),
-              children: [
-                {
-                  name: 'Overheads',
-                  id: uuidv4(),
-                  children: [
-                    {
-                      name: 'DataTable',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Plates / Knives',
-                      children:[],
-                      id: uuidv4(),
-                    },
-                    {
-                      name: 'Combo Bin Hoist 1',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Combo Bin Hoist 2',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Hooks At Batching',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Tools',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Bin Hoist Rework',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                  ],
-                },
-                {
-                  name: 'General Area',
-                  id: uuidv4(),
-                  children: [
-                    {
-                      name: 'Batching Work Station',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Work Stand Entrance',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Hand Wash',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                  ],
-                },
-                {
-                  name: 'Conveyor',
-                  id: uuidv4(),
-                  children: [
-                    {
-                      name: 'Batching Work Station',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Work Stand Entrance',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Hand Wash',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'DataTable',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Plates / Knives',
-                      children:[],
-                      id: uuidv4(),
-                    },
-                    {
-                      name: 'Combo Bin Hoist 1',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Combo Bin Hoist 2',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Hooks At Batching',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Tools',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Bin Hoist Rework',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                  ],
-                },
-              ],
+              // children: [
+              //   {
+              //     name: 'Overheads',
+              //     id: uuidv4(),
+              //     children: [
+              //       {
+              //         name: 'DataTable',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Plates / Knives',
+              //         children:[],
+              //         id: uuidv4(),
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 1',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 2',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Hooks At Batching',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Tools',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Bin Hoist Rework',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //     ],
+              //   },
+              //   {
+              //     name: 'General Area',
+              //     id: uuidv4(),
+              //     children: [
+              //       {
+              //         name: 'Batching Work Station',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Work Stand Entrance',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Hand Wash',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //     ],
+              //   },
+              //   {
+              //     name: 'Conveyor',
+              //     id: uuidv4(),
+              //     children: [
+              //       {
+              //         name: 'Batching Work Station',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Work Stand Entrance',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Hand Wash',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'DataTable',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Plates / Knives',
+              //         children:[],
+              //         id: uuidv4(),
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 1',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 2',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Hooks At Batching',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Tools',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Bin Hoist Rework',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //     ],
+              //   },
+              // ],
+              children: [],
+
             },
             {
               name: 'Plates / Knives',
@@ -166,126 +168,127 @@ const DATA = {
             {
               name: 'Combo Bin Hoist 2',
               id: uuidv4(),
-              children: [
-                {
-                  name: 'Overheads',
-                  id: uuidv4(),
-                  children: [
-                    {
-                      name: 'DataTable',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Plates / Knives',
-                      children:[],
-                      id: uuidv4(),
-                    },
-                    {
-                      name: 'Combo Bin Hoist 1',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Combo Bin Hoist 2',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Hooks At Batching',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Tools',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Bin Hoist Rework',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                  ],
-                },
-                {
-                  name: 'General Area',
-                  id: uuidv4(),
-                  children: [
-                    {
-                      name: 'Batching Work Station',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Work Stand Entrance',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Hand Wash',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                  ],
-                },
-                {
-                  name: 'Conveyor',
-                  id: uuidv4(),
-                  children: [
-                    {
-                      name: 'Batching Work Station',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Work Stand Entrance',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Hand Wash',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'DataTable',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Plates / Knives',
-                      children:[],
-                      id: uuidv4(),
-                    },
-                    {
-                      name: 'Combo Bin Hoist 1',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Combo Bin Hoist 2',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Hooks At Batching',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Batching Tools',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                    {
-                      name: 'Bin Hoist Rework',
-                      id: uuidv4(),
-                      children: [],
-                    },
-                  ],
-                },
-              ],
+              // children: [
+              //   {
+              //     name: 'Overheads',
+              //     id: uuidv4(),
+              //     children: [
+              //       {
+              //         name: 'DataTable',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Plates / Knives',
+              //         children:[],
+              //         id: uuidv4(),
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 1',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 2',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Hooks At Batching',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Tools',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Bin Hoist Rework',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //     ],
+              //   },
+              //   {
+              //     name: 'General Area',
+              //     id: uuidv4(),
+              //     children: [
+              //       {
+              //         name: 'Batching Work Station',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Work Stand Entrance',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Hand Wash',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //     ],
+              //   },
+              //   {
+              //     name: 'Conveyor',
+              //     id: uuidv4(),
+              //     children: [
+              //       {
+              //         name: 'Batching Work Station',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Work Stand Entrance',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Hand Wash',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'DataTable',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Plates / Knives',
+              //         children:[],
+              //         id: uuidv4(),
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 1',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Combo Bin Hoist 2',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Hooks At Batching',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Batching Tools',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //       {
+              //         name: 'Bin Hoist Rework',
+              //         id: uuidv4(),
+              //         children: [],
+              //       },
+              //     ],
+              //   },
+              // ],
+              children: [],
             },
             {
               name: 'Hooks At Batching',

@@ -162,14 +162,6 @@ const Tree = ({data} : {data: any}) => {
                 .attr('fill', 'white')
                 .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
 
-            const setDeletedRecursively = (node:any) => {
-                if (!node.children) return; // Exit if the node has no children
-                node.children.forEach((child:any) => {
-                    child.deleted = true;
-                    setDeletedRecursively(child); // Recurse through the child's children
-                });
-            }
-
             iconGroup.append('image')
                 .attr('href', trash)
                 .attr('x', 10)
@@ -179,12 +171,9 @@ const Tree = ({data} : {data: any}) => {
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all")
                 .on('click' , () => {
-                    selected.deleted = true;
                     selected.children = null;
-                    setDeletedRecursively(selected)
-                    if (selected.parent.children.every((child:any) => child.deleted)) {
-                        selected.parent.children = null
-                    }
+                    selected._children = null;
+                    selected.deleted = true;
                     iconGroup.attr('opacity', 0)
                     update(root)
                 })
@@ -221,7 +210,14 @@ const Tree = ({data} : {data: any}) => {
 
                 const duration = 500;
                 // @ts-ignore
-                let nodes = root.descendants().filter(node => !node.deleted);
+                let nodes = root.descendants().filter(node => !node.deleted)
+
+                nodes.forEach((node:any) => {
+                    if (node.parent && node.parent.children) {
+                        node.parent.children = node.parent.children.filter((child:any) => !child.deleted);
+                    }
+                });
+
 
                 // @ts-ignore
                 let links = root.links().filter(link => !link.target.deleted);
@@ -277,17 +273,7 @@ const Tree = ({data} : {data: any}) => {
                     .attr("stroke-opacity", 0)
                     .on("click", (event, d:any) => {
                         selected = d;
-                        console.log(d)
-                        if (d.children) {
-                            d.children = null
-                        } else {
-                            if (d._children && d._children.every((child:any) => child.deleted)) {
-                                d.children = null
-                            } else {
-                                d.children = d._children ? d._children.filter((child:any) => !child.deleted) : null;
-                            }
-                        }
-
+                        d.children = d.children ? null : d._children;
                         update(d);
                     })
                     .on("contextmenu", (event, d:any) => {
@@ -379,77 +365,8 @@ const Tree = ({data} : {data: any}) => {
         }
     } ,[treeData, dimensions])
 
-    function handleContextMenu(event: any) {
-        event.preventDefault(); // prevent default context menu from showing up
-        setShowContextMenu(true);
-        setContextMenuPosition({ x: event.clientX, y: event.clientY });
-    }
-
-    function deleteObjectById(id:string, obj:any, tree: any) {
-        if (obj.id === id) {
-            // found the object with the given ID, remove it from its parent's children array
-            const parent = getParentNode(id, tree);
-            if (parent) {
-                 parent.children = parent.children.map((child:any) => {
-                     if (child.id === id) {
-                         child.deleted = true
-                     }
-                     return child
-                 });
-                console.log(data)
-            }
-        } else {
-            // recursively search for the object with the given ID
-            obj.children.forEach((child:any) => {
-                deleteObjectById(id, child, tree);
-            });
-        }
-    }
-
-    function getParentNode(id:string, obj:any) {
-        if (obj.children.some((child:any) => child.id === id)) {
-            // found the parent node, return it
-            return obj;
-        } else {
-            // recursively search for the parent node
-            let result = null;
-            obj.children.some((child:any) => {
-                result = getParentNode(id, child);
-                return result !== null;
-            });
-            return result;
-        }
-    }
-
-    const handleDeleteNode = () => {
-         // deleteObjectById(focusedNode.data.id,data, data)
-        setShowContextMenu(false);
-    }
     return(
-            <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}>
-                {/*{showContextMenu && (*/}
-                {/*    <div*/}
-                {/*        ref={menuRef}*/}
-                {/*        style={{*/}
-                {/*            position: "absolute",*/}
-                {/*            left: contextMenuPosition.x,*/}
-                {/*            top: contextMenuPosition.y,*/}
-                {/*            display:'flex',*/}
-                {/*            flexDirection: 'row',*/}
-                {/*            gap: 15,*/}
-                {/*            padding: 10,*/}
-                {/*            borderRadius: 5,*/}
-                {/*            backgroundColor: 'white',*/}
-                {/*            boxShadow: '0px 4px 30px rgba(0, 0, 0, 0.2)'*/}
-                {/*        }}*/}
-                {/*    >*/}
-                {/*        <img onClick={handleDeleteNode} src={trash} alt='trash'/>*/}
-                {/*        <img src={add} alt='add'/>*/}
-                {/*        <img src={exchange} alt='exchange'/>*/}
-                {/*        <img src={edit} alt='edit'/>*/}
-                {/*    </div>*/}
-                {/*)}*/}
-            </div>
+        <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}/>
     )
 }
 

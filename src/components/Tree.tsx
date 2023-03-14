@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {hierarchy, HierarchyNode, linkHorizontal, pointer, select, tree} from 'd3';
+import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
 import edit from '../assets/edit.svg';
 import trash from '../assets/trash.svg';
 import add from '../assets/add.svg';
@@ -18,11 +18,6 @@ interface ISVGElement {
     opacity: number;
 }
 
-interface IData {
-    name: string;
-    id: string;
-    children: IData[];
-}
 const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [treeData, setTreeData] = useState(data);
@@ -272,7 +267,7 @@ const Tree = ({data} : {data: any}) => {
                 const nodeEnter = node
                     .enter()
                     .append("g")
-                    .attr("transform", (d) => `translate(${source.y0 || 0},${source.x0 || 0})`)
+                    .attr("transform", () => `translate(${source.y0 || 0},${source.x0 || 0})`)
                     .attr("fill-opacity", 0)
                     .attr("stroke-opacity", 0)
                     .on("click", (event, d:any) => {
@@ -340,7 +335,7 @@ const Tree = ({data} : {data: any}) => {
                 const linkEnter = link
                     .enter()
                     .append("path")
-                    .attr("d", (d) => {
+                    .attr("d", () => {
                         const o = { x: source.x0, y: source.y0 };
                         return diagonal({ source: o, target: o } as any);
                     });
@@ -353,7 +348,7 @@ const Tree = ({data} : {data: any}) => {
                     .exit()
                     .transition(transition as any)
                     .remove()
-                    .attr("d", (d) => {
+                    .attr("d", () => {
                         const o = { x: source.x, y: source.y };
                         return diagonal({ source: o, target: o } as any);
                     });

@@ -186,17 +186,104 @@ const Tree = ({data} : {data: any}) => {
                 .style("width", "100%")
                 .style("height", "50%");
 
+            const deleteGroup = svg.append('g')
+            deleteGroup.attr('opacity', 0);
+            deleteGroup.append('rect')
+                .attr('width', 200)
+                .attr('height', 170)
+                .attr('rx', 5) // Add a border radius of 5 pixels
+                .attr('fill', 'white')
+                .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
+            deleteGroup.append('text')
+                .attr('x', 10)
+                .attr('y', 30)
+                .attr('text-anchor', 'start')
+                .attr('font-size', '16px')
+                .attr('font-weight', 'bold')
+                .text('Delete Item');
+            deleteGroup.append('text')
+                .attr('x', 10)
+                .attr('y', 60)
+                .attr('text-anchor', 'start')
+                .attr('font-size', '16px')
+                .text('Are you sure you want');
+            deleteGroup.append('text')
+                .attr('x', 10)
+                .attr('y', 85)
+                .attr('text-anchor', 'start')
+                .attr('font-size', '16px')
+                .text('to delete this item?');
+            // Create a group for the buttons
+            const buttonGroup = deleteGroup.append('g')
+                .attr('transform', 'translate(0, 110)');
+
+            buttonGroup.append('rect')
+                .attr('x', 10)
+                .attr('y', 0)
+                .attr('width', 85)
+                .attr('height', 50)
+                .attr('rx', 5)
+                .attr('fill', '#4C84FF1A')
+                .on('click', () => {
+                    // Handle cancel button click
+                });
+
+            buttonGroup.append('text')
+                .attr('x', 55)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('font-weight', 'bold')
+                .attr('alignment-baseline', 'middle')
+                .attr("fill", '#4C84FF')
+                .text('CANCEL');
+
+            buttonGroup.append('rect')
+                .attr('x', 105)
+                .attr('y', 0)
+                .attr('width', 85)
+                .attr('height', 50)
+                .attr('rx', 5)
+                .attr('fill', '#EB3568')
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all")
+                .on('click', () => {
+                    selected.children = null;
+                    selected._children = null;
+                    selected.deleted = true;
+                    update(root)
+                    deleteGroup.attr("opacity", 0);
+                    iconGroup.attr("opacity", 0);
+                });
+
+            buttonGroup.append('text')
+                .attr('x', 150)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('font-weight', 'bold')
+                .attr('alignment-baseline', 'middle')
+                .attr('fill', 'white')
+                .text('DELETE')
+                .attr("cursor", "pointer")
+                .attr("pointer-events", "all")
+                .on('click', () => {
+                    selected.children = null;
+                    selected._children = null;
+                    selected.deleted = true;
+                    update(root)
+                    deleteGroup.attr("opacity", 0);
+                    iconGroup.attr("opacity", 0);
+                });
+
+
+
             const iconGroup = svg.append('g')
-
             iconGroup.attr('opacity', 0);
-
             iconGroup.append('rect')
                 .attr('width', 200)
                 .attr('height', 50)
                 .attr('rx', 5) // Add a border radius of 5 pixels
                 .attr('fill', 'white')
                 .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
-
             iconGroup.append('image')
                 .attr('href', trash)
                 .attr('x', 10)
@@ -206,13 +293,8 @@ const Tree = ({data} : {data: any}) => {
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all")
                 .on('click' , () => {
-                    selected.children = null;
-                    selected._children = null;
-                    selected.deleted = true;
-                    iconGroup.attr('opacity', 0)
-                    update(root)
+                    deleteGroup.attr('opacity', 1)
                 })
-
             iconGroup.append('image')
                 .attr('href', add)
                 .attr('x', 60)
@@ -221,7 +303,6 @@ const Tree = ({data} : {data: any}) => {
                 .attr('height', 30)
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all");
-
             iconGroup.append('image')
                 .attr('href', exchange)
                 .attr('x', 110)
@@ -230,7 +311,6 @@ const Tree = ({data} : {data: any}) => {
                 .attr('height', 30)
                 .attr("cursor", "pointer")
                 .attr("pointer-events", "all");
-
             iconGroup.append('image')
                 .attr('href', edit)
                 .attr('x', 160)
@@ -242,7 +322,6 @@ const Tree = ({data} : {data: any}) => {
 
 
             const update = (source: any) => {
-
                 const duration = 500;
                 // @ts-ignore
                 let nodes = root.descendants().filter(node => !node.deleted)
@@ -326,6 +405,18 @@ const Tree = ({data} : {data: any}) => {
                             const newY = (y - ctm.f) / ctm.d;
                             return `translate(${newX + 10}, ${newY - 60})`;
                         });
+                        deleteGroup
+                            .attr('opacity', 0)
+                            .attr('transform', () => {
+                                const {x,y} = event
+                                // @ts-ignore
+                                const ctm = svg.node().getScreenCTM();
+                                // @ts-ignore
+                                const newX = (x - ctm.e) / ctm.a;
+                                // @ts-ignore
+                                const newY = (y - ctm.f) / ctm.d;
+                                return `translate(${newX + 10}, ${newY})`;
+                            });
                         update(root)
                     });
 

@@ -27,6 +27,7 @@ const Tree = ({data} : {data: any}) => {
         .y((d: any) => d.x ? d.x : 0);
 
     useEffect(() => {
+
         if (wrapperRef.current && treeData) {
             const root = hierarchy(treeData);
             let width = (root.height + 1) * 400;
@@ -135,20 +136,55 @@ const Tree = ({data} : {data: any}) => {
 
             createLevelHeaders(root);
 
-            // const input = svg
-            //     .append("foreignObject")
-            //     .attr("width", 200)
-            //     .attr("height", 50)
-            //     .append("xhtml:input")
-            //     .style("font-size", "16px")
-            //     .style("width", "100%")
-            //     .style("height", "100%");
-            //
-            // input.on("input", () => {
-            //     // @ts-ignore
-            //     const value = input.node().value;
-            //     console.log(value);
-            // });
+            const changeName = svg.append("g");
+
+            changeName.append('rect')
+                .attr('x', 200)
+                .attr('width', 200)
+                .attr('height', 50)
+                .attr('rx', 5) // Add a border radius of 5 pixels
+                .attr('fill', 'white')
+                .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
+
+            changeName.append('image')
+                .attr('href', edit)
+                .attr('x', 360)
+                .attr('y', 10)
+                .attr('width', 30)
+                .attr('height', 30)
+
+            let text = '';
+
+            const foreignObject = changeName.append("foreignObject")
+                .attr("x", 210)
+                .attr("y", 0)
+                .attr('width', 150)
+                .attr('height', 50)
+                .attr('rx', 5) // Add a border radius of 5 pixels
+                .attr('fill', 'white')
+
+            foreignObject.append("xhtml:input")
+                .style("width", "100%")
+                .style("height", "100%")
+                .style("font-size", "20px")
+                .style("outline", 'none')
+                .style("border", "none")
+                // eslint-disable-next-line no-restricted-globals
+                .on("click", function(event, d) {
+                    event.stopPropagation();
+                    // @ts-ignore
+                    select(this).node().focus(); // Focus on the input field
+                })
+                .on("input", function(d) {
+                    // handle input changes here
+                    text = select(this).property("value");
+                    console.log(text)
+                });
+
+            foreignObject.append("xhtml:img")
+                .attr("src", "path/image.jpg")
+                .style("width", "100%")
+                .style("height", "50%");
 
             const iconGroup = svg.append('g')
 
@@ -224,7 +260,7 @@ const Tree = ({data} : {data: any}) => {
                 // Compute the new tree layout.
                 let left:any = root;
                 let right:any = root;
-                root.eachBefore((node:any) => {
+                root.eachBefore((node: any ) => {
                     if (node.x < left.x) left = node;
                     if (node.x > right.x) right = node;
                 });

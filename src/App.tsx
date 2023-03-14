@@ -264,7 +264,23 @@ const DATA = {
         {
           name: 'Bin Hoist Rework',
           id: uuidv4(),
-          children: [],
+          children: [
+            {
+              name: 'Bin Hoist Rework',
+              id: uuidv4(),
+              children: [],
+            },
+            {
+              name: 'Bin Hoist Rework',
+              id: uuidv4(),
+              children: [],
+            },
+            {
+              name: 'Bin Hoist Rework',
+              id: uuidv4(),
+              children: [],
+            },
+          ],
         },
         {
           name: 'Bin Hoist Rework',

@@ -151,6 +151,21 @@ const Tree = ({data} : {data: any}) => {
 
             createLevelHeaders(root);
 
+            // const input = svg
+            //     .append("foreignObject")
+            //     .attr("width", 200)
+            //     .attr("height", 50)
+            //     .append("xhtml:input")
+            //     .style("font-size", "16px")
+            //     .style("width", "100%")
+            //     .style("height", "100%");
+            //
+            // input.on("input", () => {
+            //     // @ts-ignore
+            //     const value = input.node().value;
+            //     console.log(value);
+            // });
+
             const iconGroup = svg.append('g')
 
             iconGroup.attr('opacity', 0);

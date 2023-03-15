@@ -47,7 +47,22 @@ const Tree = ({data} : {data: any}) => {
             }
             const svg = select(wrapperRef.current).append('svg')
 
+            svg.on('click', (event:any) => {
+                const myRect = select(wrapperRef.current).select('#icon-group').node() as SVGRectElement;
 
+                // Check if the click target is the svg element or one of its descendants, excluding "myRect"
+                const isClickInsideSvg = wrapperRef.current?.contains(event.target as Node) ?? false;
+                const isClickInsideMyRect = myRect?.contains(event.target as Node) ?? false;
+                const isClickOutsideMyRect = !isClickInsideMyRect && isClickInsideSvg;
+
+                // If the click is outside the rect, do something
+                if (isClickOutsideMyRect) {
+                    // TODO - handler to reset all popups
+                    select('#icon-group')
+                        .attr("opacity", 0)
+                        .attr('transform', 'translate(-200,-200)');
+                }
+            })
             // HANDLES
 
             const handleDeleteAction = () => {

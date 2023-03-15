@@ -1,10 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
-import edit from '../assets/edit.svg';
 import trash from '../assets/trash.svg';
-import trashClicked from '../assets/trash-clicked.svg';
-import add from '../assets/add.svg';
-import exchange from '../assets/exchange.svg';
+
 import {
     createDeleteGroup,
     createLevelBackgrounds,
@@ -15,19 +12,26 @@ import {
 
 interface CustomNode extends HierarchyNode<any> {
     _children?: CustomNode[];
+    deleted?: boolean;
+    id?: string;
 }
+
+const diagonal = linkHorizontal()
+    .x((d: any) => d.y ? d.y : 0)
+    .y((d: any) => d.x ? d.x : 0);
+
+const duration = 500;
 
 const Tree = ({data} : {data: any}) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [treeData, setTreeData] = useState(data);
 
-    const diagonal = linkHorizontal()
-        .x((d: any) => d.y ? d.y : 0)
-        .y((d: any) => d.x ? d.x : 0);
-
     useEffect(() => {
-
         if (wrapperRef.current && treeData) {
+
+            // INITIALIZATIONS
+
+            let selected:any;
             const root = hierarchy(treeData);
             let width = (root.height + 1) * 400;
             let height =  wrapperRef.current.clientHeight - 100
@@ -35,49 +39,50 @@ const Tree = ({data} : {data: any}) => {
                 // @ts-ignore
                 d.id = i;
                 d._children = d.children;
-                // @ts-ignore
                 d.deleted = false;
             });
-
-            let selected:any;
-
             const svgElement = wrapperRef.current.querySelector('svg');
             if (svgElement) {
-                // SVG element already exists in DOM, no need to append a new one
-               svgElement.remove();
+                svgElement.remove();
             }
+            const svg = select(wrapperRef.current).append('svg')
+
+
+            // HANDLES
 
             const handleDeleteAction = () => {
                 selected.children = null;
                 selected._children = null;
                 selected.deleted = true;
                 update(root)
-                select('#delete-group').attr("opacity", 0);
-                select('#icon-group').attr("opacity", 0);
+                select('#delete-group')
+                    .attr("opacity", 0)
+                    .attr('transform', 'translate(-200,-200)');
+                select('#icon-group')
+                    .attr("opacity", 0)
+                    .attr('transform', 'translate(-200,-200)');
                 select('#trash-icon')
                     .attr('href', trash)
             }
 
-            const svg = select(wrapperRef.current).append('svg')
+            // SVG ELEMENTS CREATION
+
             createLevelHeaders(root, svg, width);
             const gLink = createLinkElement(svg);
             const gNode =createNodeElement(svg);
             const deleteGroup = createDeleteGroup(svg, handleDeleteAction);
             const iconGroup = createMenu(svg);
 
-            const update = (source: any) => {
-                const duration = 500;
-                // @ts-ignore
-                let nodes = root.descendants().filter(node => !node.deleted)
+            // MAIN UPDATE FUNCTION
 
+            const update = (source: any) => {
+                let nodes = root.descendants().filter((node:CustomNode) => !node.deleted)
                 nodes.forEach((node:any) => {
                     if (node.parent && node.parent.children) {
                         node.parent.children = node.parent.children.filter((child:any) => !child.deleted);
                     }
                 });
-
-                // @ts-ignore
-                let links = root.links().filter(link => !link.target.deleted);
+                let links = root.links().filter((link:any) => !link.target.deleted);
 
                 // Compute the new tree layout.
                 let left:any = root;
@@ -91,6 +96,7 @@ const Tree = ({data} : {data: any}) => {
                 // height = nodes.length * 20 + 100;
                 const treeLayout = tree().size([height, width]);
                 treeLayout(root);
+
                 createLevelBackgrounds(root, svg, width, height)
 
                 svg
@@ -103,7 +109,6 @@ const Tree = ({data} : {data: any}) => {
                     .duration(duration)
                     .tween(
                         "resize",
-                        // TODO - next line might not be needed
                         // @ts-ignore
                         window.ResizeObserver ? null : () => () => svg.dispatch("toggle")
                     );
@@ -151,13 +156,12 @@ const Tree = ({data} : {data: any}) => {
                             .attr('opacity', 0)
                             .attr('transform', () => {
                                 const {x,y} = event
-                                // @ts-ignore
-                                const ctm = svg.node().getScreenCTM();
-                                // @ts-ignore
-                                const newX = (x - ctm.e) / ctm.a;
-                                // @ts-ignore
-                                const newY = (y - ctm.f) / ctm.d;
-                                return `translate(${newX + 10}, ${newY})`;
+                                const ctm = svg.node()?.getScreenCTM();
+                                if (ctm) {
+                                    const newX = (x - ctm.e) / ctm.a;
+                                    const newY = (y - ctm.f) / ctm.d;
+                                    return `translate(${newX + 10}, ${newY})`;
+                                }
                             });
                         update(root)
                     });

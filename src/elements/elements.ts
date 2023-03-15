@@ -104,7 +104,9 @@ export const createDeleteGroup = (svg:any, handleClickAction:any) => {
     const group = svg
         .append('g')
         .attr('id', 'delete-group')
-        .attr('opacity', 0);
+        .attr('opacity', 0)
+        .attr('transform', 'translate(-200,-200)');
+
 
     group.append('rect')
         .attr('width', 200)
@@ -200,7 +202,8 @@ export const createDeleteGroup = (svg:any, handleClickAction:any) => {
 
 export const createMenu = (svg:any) => {
     const iconGroup = svg.append('g').attr('id', 'icon-group')
-    iconGroup.attr('opacity', 0);
+    iconGroup.attr('opacity', 0).attr('transform', 'translate(-200,-200)');
+
     iconGroup.append('rect')
         .attr('width', 200)
         .attr('height', 50)

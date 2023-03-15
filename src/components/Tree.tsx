@@ -33,7 +33,7 @@ const Tree = ({data} : {data: any}) => {
             let selected:any;
             const root = hierarchy(treeData);
             let width = (root.height + 1) * 400;
-            let height =  wrapperRef.current.clientHeight - 100
+            let height =  wrapperRef.current.clientHeight
             root.descendants().forEach((d:CustomNode, i) => {
                 // @ts-ignore
                 d.id = i;
@@ -96,7 +96,7 @@ const Tree = ({data} : {data: any}) => {
 
                 svg
                     .attr('height', height)
-                    .attr("viewBox", `0 -100 ${width} ${height + 100}`)
+                    .attr("viewBox", `0 -100 ${width} ${height + 350}`)
                     .classed("svg-content-responsive", true)
 
                 const transition = svg

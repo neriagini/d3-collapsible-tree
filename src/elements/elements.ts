@@ -1,9 +1,12 @@
 import edit from "../assets/edit.svg";
+import editClicked from "../assets/edit-clicked.svg";
 import {select} from "d3";
 import trash from "../assets/trash.svg";
 import trashClicked from "../assets/trash-clicked.svg";
 import add from "../assets/add.svg";
+import addClicked from "../assets/add-clicked.svg";
 import exchange from "../assets/exchange.svg";
+import exchangeClicked from "../assets/exchange-clicked.svg";
 
 interface ISVGElement {
     x: number;
@@ -100,42 +103,127 @@ export const createLevelBackgrounds = (root: any, svg:any, width:number, height:
         .lower();
 };
 
-export const createDeleteGroup = (svg:any, handleClickAction:any) => {
-    const group = svg
+export const createMenu = (svg:any, handleDeleteAction: any) => {
+
+    const menu = svg.append('g').attr('id', 'menu').attr('transform', 'translate(-200,-200)');
+
+    const resetSelection = () => {
+        select('#trash-icon').attr('href', trash)
+        select('#edit-icon').attr('href', edit)
+        select('#exchange-icon').attr('href', exchange)
+        select('#add-icon').attr('href', add)
+        select('#action-frame')
+            .attr('opacity', 1)
+            .selectAll("*:not(#background):not(#action-frame)")
+            .remove();
+    }
+
+    menu.append('rect')
+        .attr('width', 200)
+        .attr('height', 50)
+        .attr('rx', 5) // Add a border radius of 5 pixels
+        .attr('fill', 'white')
+        .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
+    menu.append('image')
+        .attr('id', 'trash-icon')
+        .attr('href', trash)
+        .attr('x', 10)
+        .attr('y', 10)
+        .attr('width', 30)
+        .attr('height', 30)
+        .attr('fill', 'red')
+        .attr("cursor", "pointer")
+        .attr("pointer-events", "all")
+        .on('click' , () => {
+            resetSelection()
+            select('#trash-icon').attr('href', trashClicked)
+            createDeleteAction(handleDeleteAction)
+        })
+    menu.append('image')
+        .attr('id', 'add-icon')
+        .attr('href', add)
+        .attr('x', 60)
+        .attr('y', 10)
+        .attr('width', 30)
+        .attr('height', 30)
+        .attr("cursor", "pointer")
+        .attr("pointer-events", "all")
+        .on('click' , () => {
+            resetSelection()
+            select('#add-icon').attr('href', addClicked)
+        })
+    menu.append('image')
+        .attr('id', 'exchange-icon')
+        .attr('href', exchange)
+        .attr('x', 110)
+        .attr('y', 10)
+        .attr('width', 30)
+        .attr('height', 30)
+        .attr("cursor", "pointer")
+        .attr("pointer-events", "all")
+        .on('click' , () => {
+            resetSelection()
+            select('#exchange-icon').attr('href', exchangeClicked)
+        })
+    menu.append('image')
+        .attr('id', 'edit-icon')
+        .attr('href', edit)
+        .attr('x', 160)
+        .attr('y', 10)
+        .attr('width', 30)
+        .attr('height', 30)
+        .attr("cursor", "pointer")
+        .attr("pointer-events", "all")
+        .on('click' , () => {
+            resetSelection()
+            select('#edit-icon').attr('href', editClicked)
+            createRenameAction()
+        })
+
+    return menu;
+}
+
+export const createActionFrame = (svg:any) => {
+    const actionFrame = svg
         .append('g')
-        .attr('id', 'delete-group')
+        .attr('id', 'action-frame')
         .attr('opacity', 0)
         .attr('transform', 'translate(-200,-200)');
 
-
-    group.append('rect')
+    actionFrame.append('rect')
+        .attr('id', 'background')
         .attr('width', 200)
         .attr('height', 170)
         .attr('rx', 5) // Add a border radius of 5 pixels
         .attr('fill', 'white')
         .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
 
-    group.append('text')
+    return actionFrame;
+}
+
+export const createDeleteAction = (handleDeleteAction:any) => {
+    const element = select('#action-frame')
+    element.append('text')
         .attr('x', 10)
         .attr('y', 30)
         .attr('text-anchor', 'start')
         .attr('font-size', '16px')
         .attr('font-weight', 'bold')
         .text('Delete Item');
-    group.append('text')
+    element.append('text')
         .attr('x', 10)
         .attr('y', 60)
         .attr('text-anchor', 'start')
         .attr('font-size', '16px')
         .text('Are you sure you want');
-    group.append('text')
+    element.append('text')
         .attr('x', 10)
         .attr('y', 85)
         .attr('text-anchor', 'start')
         .attr('font-size', '16px')
         .text('to delete this item?');
 
-    const buttons = group.append('g')
+    const buttons = element.append('g')
         .attr('transform', 'translate(0, 110)');
 
     buttons.append('rect')
@@ -149,8 +237,8 @@ export const createDeleteGroup = (svg:any, handleClickAction:any) => {
         .attr("cursor", "pointer")
         .attr("pointer-events", "all")
         .on('click', () => {
-            select('#delete-group').attr("opacity", 0);
-            select('#icon-group').attr("opacity", 0);
+            select('#menu').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
+            select('#action-frame').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
             select('#trash-icon')
                 .attr('href', trash)
         });
@@ -167,8 +255,8 @@ export const createDeleteGroup = (svg:any, handleClickAction:any) => {
         .attr("cursor", "pointer")
         .attr("pointer-events", "all")
         .on('click', () => {
-            select('#delete-group').attr("opacity", 0);
-            select('#icon-group').attr("opacity", 0);
+            select('#action-frame').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
+            select('#menu').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
             select('#trash-icon')
                 .attr('href', trash)
         });
@@ -182,7 +270,7 @@ export const createDeleteGroup = (svg:any, handleClickAction:any) => {
         .attr('fill', '#EB3568')
         .attr("cursor", "pointer")
         .attr("pointer-events", "all")
-        .on('click', handleClickAction)
+        .on('click', handleDeleteAction)
 
     buttons.append('text')
         .attr('id', 'delete-button-text')
@@ -195,62 +283,56 @@ export const createDeleteGroup = (svg:any, handleClickAction:any) => {
         .text('DELETE')
         .attr("cursor", "pointer")
         .attr("pointer-events", "all")
-        .on('click', handleClickAction)
-
-    return group;
+        .on('click', handleDeleteAction)
 }
 
-export const createMenu = (svg:any) => {
-    const iconGroup = svg.append('g').attr('id', 'icon-group')
-    iconGroup.attr('opacity', 0).attr('transform', 'translate(-200,-200)');
 
-    iconGroup.append('rect')
-        .attr('width', 200)
-        .attr('height', 50)
-        .attr('rx', 5) // Add a border radius of 5 pixels
-        .attr('fill', 'white')
-        .style('filter', 'drop-shadow(0px 4px 30px rgba(0, 0, 0, 0.2))') // Add a box shadow
-    iconGroup.append('image')
-        .attr('id', 'trash-icon')
-        .attr('href', trash)
+export const createRenameAction = () => {
+    const element = select('#action-frame')
+    element.append('text')
         .attr('x', 10)
-        .attr('y', 10)
-        .attr('width', 30)
-        .attr('height', 30)
-        .attr('fill', 'red')
+        .attr('y', 30)
+        .attr('text-anchor', 'start')
+        .attr('font-size', '16px')
+        .attr('font-weight', 'bold')
+        .text('Rename Item');
+
+    const buttons = element.append('g')
+        .attr('transform', 'translate(0, 110)');
+
+    buttons.append('rect')
+        .attr('id', 'rename-button')
+        .attr('x', 10)
+        .attr('y', 0)
+        .attr('width', 85)
+        .attr('height', 50)
+        .attr('rx', 5)
+        .attr('fill', '#4C84FF1A')
         .attr("cursor", "pointer")
         .attr("pointer-events", "all")
-        .on('click' , () => {
-            select('#trash-icon')
-                .attr('href', trashClicked)
-            select('#delete-group').attr('opacity', 1)
-        })
-    iconGroup.append('image')
-        .attr('href', add)
-        .attr('x', 60)
-        .attr('y', 10)
-        .attr('width', 30)
-        .attr('height', 30)
-        .attr("cursor", "pointer")
-        .attr("pointer-events", "all");
-    iconGroup.append('image')
-        .attr('href', exchange)
-        .attr('x', 110)
-        .attr('y', 10)
-        .attr('width', 30)
-        .attr('height', 30)
-        .attr("cursor", "pointer")
-        .attr("pointer-events", "all");
-    iconGroup.append('image')
-        .attr('href', edit)
-        .attr('x', 160)
-        .attr('y', 10)
-        .attr('width', 30)
-        .attr('height', 30)
-        .attr("cursor", "pointer")
-        .attr("pointer-events", "all");
+        .on('click', () => {
+            select('#menu').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
+            select('#action-frame').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
+        });
 
-    return iconGroup;
+    buttons.append('text')
+        .attr('id', 'rename-button-text')
+        .attr('x', 55)
+        .attr('y', 25)
+        .attr('text-anchor', 'middle')
+        .attr('font-weight', 'bold')
+        .attr('alignment-baseline', 'middle')
+        .attr("fill", '#4C84FF')
+        .text('Rename')
+        .attr("cursor", "pointer")
+        .attr("pointer-events", "all")
+        .on('click', () => {
+            select('#action-frame').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
+            select('#menu').attr("opacity", 0).attr('transform', 'translate(-200,-200)');
+            select('#trash-icon')
+                .attr('href', trash)
+        });
+
 }
 
 // const changeName = svg.append("g");

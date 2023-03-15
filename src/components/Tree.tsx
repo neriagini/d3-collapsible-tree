@@ -3,7 +3,7 @@ import {hierarchy, HierarchyNode, linkHorizontal, select, tree} from 'd3';
 import trash from '../assets/trash.svg';
 
 import {
-    createDeleteGroup,
+    createActionFrame,
     createLevelBackgrounds,
     createLevelHeaders,
     createLinkElement, createMenu,
@@ -30,7 +30,6 @@ const Tree = ({data} : {data: any}) => {
         if (wrapperRef.current && treeData) {
 
             // INITIALIZATIONS
-
             let selected:any;
             const root = hierarchy(treeData);
             let width = (root.height + 1) * 400;
@@ -47,49 +46,30 @@ const Tree = ({data} : {data: any}) => {
             }
             const svg = select(wrapperRef.current).append('svg')
 
-            svg.on('click', (event:any) => {
-                const myRect = select(wrapperRef.current).select('#icon-group').node() as SVGRectElement;
-
-                // Check if the click target is the svg element or one of its descendants, excluding "myRect"
-                const isClickInsideSvg = wrapperRef.current?.contains(event.target as Node) ?? false;
-                const isClickInsideMyRect = myRect?.contains(event.target as Node) ?? false;
-                const isClickOutsideMyRect = !isClickInsideMyRect && isClickInsideSvg;
-
-                // If the click is outside the rect, do something
-                if (isClickOutsideMyRect) {
-                    // TODO - handler to reset all popups
-                    select('#icon-group')
-                        .attr("opacity", 0)
-                        .attr('transform', 'translate(-200,-200)');
-                }
-            })
             // HANDLES
-
             const handleDeleteAction = () => {
                 selected.children = null;
                 selected._children = null;
                 selected.deleted = true;
                 update(root)
-                select('#delete-group')
+                svg.select('#menu')
                     .attr("opacity", 0)
                     .attr('transform', 'translate(-200,-200)');
-                select('#icon-group')
+                svg.select('#action-frame')
                     .attr("opacity", 0)
                     .attr('transform', 'translate(-200,-200)');
-                select('#trash-icon')
+                menu.select('#trash-icon')
                     .attr('href', trash)
             }
 
             // SVG ELEMENTS CREATION
-
             createLevelHeaders(root, svg, width);
             const gLink = createLinkElement(svg);
             const gNode =createNodeElement(svg);
-            const deleteGroup = createDeleteGroup(svg, handleDeleteAction);
-            const iconGroup = createMenu(svg);
+            const actionFrame = createActionFrame(svg);
+            const menu = createMenu(svg, handleDeleteAction);
 
             // MAIN UPDATE FUNCTION
-
             const update = (source: any) => {
                 let nodes = root.descendants().filter((node:CustomNode) => !node.deleted)
                 nodes.forEach((node:any) => {
@@ -155,19 +135,19 @@ const Tree = ({data} : {data: any}) => {
                     .on("contextmenu", (event:any, d:any) => {
                         event.preventDefault(); // prevent default context menu from showing up
                         selected = d;
-                        iconGroup
+                        menu
                             .attr('opacity', 1)
                             .attr('transform', () => {
                             const {x,y} = event
                             // @ts-ignore
                             const ctm = svg.node().getScreenCTM();
-                            // @ts-ignore
-                            const newX = (x - ctm.e) / ctm.a;
-                            // @ts-ignore
-                            const newY = (y - ctm.f) / ctm.d;
-                            return `translate(${newX + 10}, ${newY - 60})`;
+                            if (ctm) {
+                                const newX = (x - ctm.e) / ctm.a;
+                                const newY = (y - ctm.f) / ctm.d;
+                                return `translate(${newX + 10}, ${newY - 60})`;
+                            }
                         });
-                        deleteGroup
+                        actionFrame
                             .attr('opacity', 0)
                             .attr('transform', () => {
                                 const {x,y} = event
@@ -216,7 +196,7 @@ const Tree = ({data} : {data: any}) => {
                     .attr("fill-opacity", 0)
                     .attr("stroke-opacity", 0);
 
-                // Update the links…
+                // Update the links
                 const link = gLink.selectAll("path").data(links, (d:any) => d.target.id);
 
                 // Enter any new links at the parent's previous position.
@@ -251,9 +231,7 @@ const Tree = ({data} : {data: any}) => {
         }
     } ,[treeData])
 
-    return(
-        <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}/>
-    )
+    return <div ref={wrapperRef} style={{position:'relative', height: '100%', width:'100%'}}/>
 }
 
 export default Tree;
